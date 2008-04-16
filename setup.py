@@ -30,6 +30,8 @@ setup(name='oc-geotag',
           'geopy==0.93-20071130',  # forces our vendor branch.
       ],
       entry_points="""
+      [topp.zcmlloader]
+      opencore = opencore.geotagging
       # -*- Entry points: -*-
       """,
       )
