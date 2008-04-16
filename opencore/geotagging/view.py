@@ -13,7 +13,7 @@ import logging
 import utils
 import warnings
 
-logger = logging.getLogger('opencore.geocoding')
+logger = logging.getLogger('opencore.geotagging')
 
 class ReadGeoView(Acquisition.Explicit):
 

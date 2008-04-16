@@ -3,7 +3,7 @@ from opencore.i18n import _
 import logging
 import urllib
 
-logger = logging.getLogger('geocoding.utils')
+logger = logging.getLogger('geotagging.utils')
 
 def google_e6_encode(lat_or_lon):
     """Google makes life easy for themselves, and harder for us, by
@@ -94,14 +94,14 @@ def update_info_from_form(orig_info, form, geocoder):
     to use if needed, returns a dict and a list: (new_info, changed).
 
     The new_info dict is just like the orig_info input, but merged
-    with any changes from the form, and does geocoding to get new
+    with any changes from the form, and does geotagging to get new
     coords if necessary.
 
     The changed list is a list of keys in the dict that are different
     from the values in orig_info.
 
     The geocoder must have a 'geocode' method that accepts a string
-    argument and returns a list of list results.  If geocoding fails,
+    argument and returns a list of list results.  If geotagging fails,
     we'll add an 'errors' key to the result dict, with a message.
 
     A bit of test setup::
@@ -110,7 +110,7 @@ def update_info_from_form(orig_info, form, geocoder):
     ...         'position-text': 'ocean south of ghana',
     ...         'location': 'very mysterious',
     ...         'static_img_url': ''}
-    >>> from opencore.geocoding.testing import MockGeocoder
+    >>> from opencore.geotagging.testing import MockGeocoder
     >>> geocoder = MockGeocoder()
     >>> from pprint import pprint
 
@@ -121,7 +121,7 @@ def update_info_from_form(orig_info, form, geocoder):
     >>> changed
     []
 
-    If only text is passed, we use that for geocoding::
+    If only text is passed, we use that for geotagging::
 
     >>> form = {'position-text': 'aha'}
     >>> info, changed = update_info_from_form(orig, form, geocoder)
@@ -173,7 +173,7 @@ def update_info_from_form(orig_info, form, geocoder):
     If coordinates *and* text are passed, we use the coords::
 
     >>> form = {'position-latitude': 8, 'position-longitude': 9,
-    ...         'position-text': 'stored but not used for geocoding'}
+    ...         'position-text': 'stored but not used for geotagging'}
     >>> info, changed = update_info_from_form(orig, form, geocoder)
     >>> info['position-text'] == form['position-text']
     True

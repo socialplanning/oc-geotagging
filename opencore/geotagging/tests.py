@@ -1,6 +1,6 @@
 from Products.OpenPlans.tests.openplanstestcase import OpenPlansTestCase
 from Testing import ZopeTestCase
-from opencore.geocoding.testing import readme_setup, readme_teardown
+from opencore.geotagging.testing import readme_setup, readme_teardown
 from opencore.testing import dtfactory as dtf
 from opencore.testing.layer import OpencoreContent as test_layer
 from opencore.testing.setup import hook_setup
@@ -18,12 +18,12 @@ def test_suite():
     from opencore.member.browser.view import ProfileView
     from pprint import pprint
     from Products.PleiadesGeocoder.interfaces import IGeoItemSimple
-    from opencore.geocoding.interfaces import IGeoFolder, \
+    from opencore.geotagging.interfaces import IGeoFolder, \
          IReadGeo, IWriteGeo, IReadWriteGeo, \
          IGeoreferenceable, IGeoAnnotatableContent, IGeoserializable, \
          IGeoserializableMembersFolder
-    from opencore.geocoding.view import get_geo_reader
-    from opencore.geocoding.view import get_geo_writer
+    from opencore.geotagging.view import get_geo_reader
+    from opencore.geotagging.view import get_geo_writer
     ZopeTestCase.installProduct('PleiadesGeocoder')
     setup.setupPloneSite()
 
@@ -31,7 +31,7 @@ def test_suite():
 
     config = dtf.ZopeDocFileSuite('configuration.txt',
                                   optionflags=optionflags,
-                                  package='opencore.geocoding',
+                                  package='opencore.geotagging',
                                   test_class=OpenPlansTestCase,
                                   globs=globs,
                                   setUp=hook_setup,
@@ -39,14 +39,14 @@ def test_suite():
                                   )
     readme = dtf.ZopeDocFileSuite("README.txt",
                                   optionflags=optionflags,
-                                  package='opencore.geocoding',
+                                  package='opencore.geotagging',
                                   test_class=OpenPlansTestCase,
                                   globs = globs,
                                   setUp=readme_setup,
                                   tearDown=readme_teardown,
                                   layer=test_layer
                                   )
-    utilsunit = doctest.DocTestSuite('opencore.geocoding.utils',
+    utilsunit = doctest.DocTestSuite('opencore.geotagging.utils',
                                      optionflags=optionflags)
     return unittest.TestSuite((utilsunit,
                                config,

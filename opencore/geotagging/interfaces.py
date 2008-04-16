@@ -2,7 +2,7 @@ from Products.PleiadesGeocoder.interfaces.simple import *
 from zope.interface import Interface
 
 class IReadGeo(Interface):
-    """View for using OpenCore content with geocoding.
+    """View for using OpenCore content with geotagging.
     """
 
     def get_geolocation():
@@ -41,7 +41,7 @@ class IWriteGeo(Interface):
 
         (You *can* optionally pass a form to override the
         request.form, and/or pass old_info if you're writing an add
-        view and the content you're geocoding doesn't exist yet.)
+        view and the content you're geotagging doesn't exist yet.)
 
         No side effects, just returns stuff.
         """
