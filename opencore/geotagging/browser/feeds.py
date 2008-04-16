@@ -4,7 +4,7 @@ import cStringIO
 import traceback
 import logging
 
-logger = logging.getLogger('opencore.geocoding.feeds')
+logger = logging.getLogger('opencore.geotagging.feeds')
 
 _rss_head = '''<?xml version="1.0" encoding="utf-8"?>
 <feed

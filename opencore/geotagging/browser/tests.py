@@ -1,4 +1,4 @@
-from opencore.geocoding.testing import readme_setup, readme_teardown
+from opencore.geotagging.testing import readme_setup, readme_teardown
 from opencore.testing import dtfactory as dtf
 from opencore.testing.layer import OpencoreContent as test_layer
 from zope.testing import doctest
@@ -15,7 +15,7 @@ def test_suite():
     from Products.PloneTestCase import setup
     from Products.PloneTestCase.PloneTestCase import FunctionalTestCase
     from Testing.ZopeTestCase import installProduct
-    from opencore.geocoding.view import get_geo_writer
+    from opencore.geotagging.view import get_geo_writer
     from opencore.testing import utils
     from pprint import pprint
     from zope.component import getUtility
@@ -50,7 +50,7 @@ def test_suite():
     readme = dtf.FunctionalDocFileSuite(
         "README.txt", 
         optionflags=optionflags,
-        package='opencore.geocoding.browser',
+        package='opencore.geotagging.browser',
         test_class=FunctionalTestCase,
         globs = globs,
         setUp=readme_setup,
