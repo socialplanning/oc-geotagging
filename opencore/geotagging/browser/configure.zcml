@@ -25,5 +25,12 @@
      name="kml"
      />
 
-
+  <browser:viewlet
+     name="project_locationform"
+     for="*"
+     manager="opencore.project.browser.interfaces.IProjectPrefs"
+     class=".viewlets.ProjectViewlet"
+     template="project_viewlet.pt"
+     permission="zope2.View"
+/>
 </configure>
