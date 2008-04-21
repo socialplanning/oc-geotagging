@@ -32,5 +32,12 @@
      class=".viewlets.ProjectViewlet"
      template="project_viewlet.pt"
      permission="zope2.View"
-/>
+     />
+  <browser:viewlet
+     name="geo_script_tag"
+     for="*"
+     manager="opencore.browser.interfaces.IJSViewlets"
+     class=".viewlets.GeoJSViewlet"
+     permission="zope2.View"
+     />
 </configure>
