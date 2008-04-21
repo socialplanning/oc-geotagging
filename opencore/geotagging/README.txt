@@ -71,7 +71,7 @@ Now let's try the writer::
 The request overrides the values returned by get_geo_info_from_form,
 but not geo_info:
 
-    >>> old_info = view.geo_info.copy()
+    >>> old_info = reader.geo_info().copy()
     >>> view.request.form.update({'location': 'nunya bizness',
     ...     'position-latitude': 1.2, 'position-longitude': 3.4,
     ...     'position-text': 'my house',  'static_img_url': 'IGNORED',
@@ -138,11 +138,11 @@ Now try the writer::
 
 Request values override get_geo_info_from_form but not geo_info:
 
-    >>> old_info = view.geo_info.copy()
+    >>> old_info = reader.geo_info().copy()
     >>> view.request.form.update({'position-latitude': 45.0,
     ...  'position-longitude': 0.0, 'location': 'somewhere', })
 
-    >>> view.geo_info == old_info
+    >>> reader.geo_info() == old_info
     True
     >>> info, changed = writer.get_geo_info_from_form()
     >>> info == old_info

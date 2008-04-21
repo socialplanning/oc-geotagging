@@ -206,8 +206,8 @@ def update_info_from_form(orig_info, form, geocoder):
     if newtext and newtext != oldtext:
         new_info['position-text'] = newtext
 
-    if (newlat != '' and newlon != '') and (newlat != oldlat or
-                                            newlon != oldlon):
+    if (newlat != '' and newlon != '') and (float(newlat) != oldlat or
+                                            float(newlon) != oldlon):
         # If form has updated coords, always use them.
         try:
             newlat = float(newlat)
