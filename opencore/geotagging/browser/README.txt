@@ -132,6 +132,13 @@ Create view for Projects
 
     >>> self.login(project_admin)
     >>> createview = projects.restrictedTraverse("create")
+
+Looking up geo info on the add view gives us nothing much useful,
+because the project doesn't exist yet::
+
+    >>> view.geo_info['is_geocoded']
+    False
+
     >>> createview.request.form.update({'project_title': 'A geolocated project!',
     ...    'projid': 'testgeo', 'workflow_policy': 'medium_policy',
     ...    'position-latitude': '33.33', 'position-longitude': '44.44'})
