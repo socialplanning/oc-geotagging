@@ -32,7 +32,7 @@ class GeoViewlet(ViewletBase):
 
     def update(self):
         """Save coordinates and any other geo info, if necessary."""
-        view = self.__parent__  # XXX is there another idiom for this?
+        view = self.__parent__
         geowriter = get_geo_writer(view)
         geo_info, locationchanged = geowriter.get_geo_info_from_form()
         errors = geo_info.get('errors', {})

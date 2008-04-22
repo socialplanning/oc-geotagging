@@ -115,8 +115,10 @@ The view includes a bunch of convenient geo-related stuff for UIs::
     ['is_geocoded', 'location', 'maps_script_url', 'position-latitude', 'position-longitude', 'position-text', 'static_img_url']
     >>> viewlet.geo_info['is_geocoded']
     True
-    >>> viewlet.geo_info['location']
-    'oceania'
+
+#    >>> viewlet.geo_info['location']
+#    'oceania'
+
     >>> round(viewlet.geo_info['position-latitude'])
     12.0
     >>> round(viewlet.geo_info['position-longitude'])
@@ -270,6 +272,7 @@ xml.
     >>> feedview = projects.restrictedTraverse('@@georss')
     >>> xml = get_response_output(feedview)
     >>> lines = [s.strip() for s in xml.split('\n') if s.strip()]
+
 #    >>> print '\n'.join(lines)
 #    Status: 200 OK...
 #    <?xml...
@@ -290,6 +293,7 @@ And a separate view that generates kml markup::
     >>> feedview = projects.restrictedTraverse('@@kml')
     >>> xml = feedview()
     >>> lines = [s.strip() for s in xml.split('\n') if s.strip()]
+
 #    >>> print '\n'.join(lines)
 #    <?xml...
 #    <kml xmlns="http://earth.google.com/kml/2.1">
