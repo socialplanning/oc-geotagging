@@ -52,8 +52,16 @@ class MemberProfileViewlet(GeoViewlet):
 
     render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
 
+    @property
+    def geo_info(self):
+        geo = get_geo_reader(self.__parent__)
+        info = geo.geo_info()
+        # Override the static map image size. Ugh, sucks to have this in code.
+        info['static_img_url'] = geo.location_img_url(width=285, height=285)
+        return info
 
-class MemberProfileEditViewlet(GeoViewlet):
+
+class MemberProfileEditViewlet(MemberProfileViewlet):
 
     render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
 
