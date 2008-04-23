@@ -17,8 +17,6 @@ Look for geolocation info, first when it's not set...
     >>> viewlet = ProjectViewlet(view.context, view.request, view,
     ...                          "irrelevant manager")
     >>> form = {}
-    >>> view.has_geocoder
-    True
     >>> writer = get_geo_writer(view)
     >>> info, changed = writer.save_coords_from_form(form)
     >>> changed

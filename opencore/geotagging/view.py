@@ -66,7 +66,7 @@ class ReadGeoView(Acquisition.Explicit):
         return IGeoItemSimple(self.context)
 
     def _maps_script_url(self):
-        if not self.view.has_geocoder:
+        if not self.has_geocoder():  # XXX do we really care about this?
             return ''
         url = self.request['ACTUAL_URL']
         # In python 2.5, this could be written as urlparse(url).hostname
