@@ -7,10 +7,6 @@
     >
 
   <!-- View to abstract geocoding api on our content.
-       TO DO: move the interface into opencore,
-       and register a default do-nothing implementation,
-       and then override it here, so everything works w/o geolocation
-       installed. then we can make this package optional.
 
        Note, we don't really care about these being pages, but in zope
        2.9, security on browser:view seems to not work at all - you
