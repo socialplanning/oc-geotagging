@@ -45,7 +45,7 @@ class GeoViewlet(ViewletBase):
 
 class ProjectViewlet(GeoViewlet):
 
-    render = ZopeTwoPageTemplateFile('project_viewlet.pt')
+    render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
     
 class MemberProfileViewlet(GeoViewlet):
