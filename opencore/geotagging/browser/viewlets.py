@@ -91,14 +91,22 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     implements(interfaces.IReadWriteGeo)
 
+    new_info = None
+
     def update(self):
-        """Save coordinates and any other geo info, if necessary."""
+        """hmm, what should this do?"""
+        pass
+
+    def save(self):
+        """Save form data, if changed."""
         view = self.__parent__
+        # XXX we've already geocoded in validate(), don't hit google twice!
         geo_info, locationchanged = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         if errors:
             view.errors.update(errors)
         elif locationchanged:
+            # XXX and yet another google hit...
             self.save_coords_from_form()
             view.add_status_message(_(u'psm_location_changed'))
         
@@ -113,6 +121,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         view = self.__parent__
         geo_info, locationchanged = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
+        self.new_info = geo_info
         return errors
 
     def set_geolocation(self, coords):
