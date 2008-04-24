@@ -7,13 +7,6 @@
     >
 
   <!-- View to abstract geocoding api on our content.
-
-       Note, we don't really care about these being pages, but in zope
-       2.9, security on browser:view seems to not work at all - you
-       can declare whatever you want, and if anonymous has View
-       permission on view.context, then he can traverse to and call
-       any method of the view. Yay!
-
    -->
 
  <!-- Register a do-nothing adapter for content in general... -->
