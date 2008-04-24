@@ -1,69 +1,206 @@
 import warnings
+from Products.CMFCore.utils import getToolByName
+from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.Five.viewlet.viewlet import ViewletBase
 from opencore.browser.base import _
 from opencore.configuration.utils import get_config
-from opencore.geotagging.view import get_geo_writer, get_geo_reader
-
+from opencore.geotagging import interfaces
+from opencore.geotagging import utils
+from opencore.interfaces import IProject
+from opencore.member.interfaces import IOpenMember
 from urlparse import urlparse
+from zope.interface import implements
 
-class GeoViewlet(ViewletBase):
+class ReadGeoViewletBase(ViewletBase):
 
     sort_order = 123  # we'll sort this out later. HA HA I FUNNY
 
+    implements(interfaces.IReadGeo)
+
+    def update(self):
+        pass
+
+    def render(self):
+        raise NotImplementedError
+
+    def is_geocoded(self):
+        """See IReadGeo."""
+        coords = self._get_geo_item().coords
+        return bool(coords and not None in coords)
+
     @property
     def geo_info(self):
-        """geo information for display in forms;
-        takes values from request, falls back to existing project
-        if possible."""
-        # I suspect these viewlets are going to totally replace the
-        # stuff in geotagging/view.py; right now, just trying to get
-        # tests passing again.
-        geo = get_geo_reader(self.__parent__)
-        return geo.geo_info()
+        """See IReadGeo"""
+        info = {'static_img_url': self.location_img_url(),
+                'is_geocoded': self.is_geocoded(),
+                } #'maps_script_url': self._maps_script_url()}
+        content = self._get_viewedcontent()
+        info['location'] = content and content.getLocation() or ''
+        info['position-text'] = content and content.getPositionText() or ''
+        coords = self.get_geolocation()
+        try:
+            lon, lat = coords[:2]
+        except (ValueError, TypeError):
+            lon, lat = '', ''
+        info['position-latitude'] = lat
+        info['position-longitude'] = lon
+        return info
 
-    def validate(self):
-        view = self.__parent__  # XXX is there another idiom for this?
-        geowriter = get_geo_writer(view)
-        geo_info, locationchanged = geowriter.get_geo_info_from_form()
-        errors = geo_info.get('errors', {})
-        return errors
-        
+##     @property
+##     def geo_info(self):
+##         """geo information for display in forms;
+##         takes values from request, falls back to existing project
+##         if possible."""
+##         # I suspect these viewlets are going to totally replace the
+##         # stuff in geotagging/view.py; right now, just trying to get
+##         # tests passing again.
+##         geo = get_geo_reader(self.__parent__)
+##         return geo.geo_info()
+
+    def has_geocoder(self):
+        """See IReadGeo. Is a PleiadesGeocoder tool available?
+        """
+        # XXX Is this still used anywhere?
+        return getToolByName(self.context, 'portal_geocoder', None) is not None
+
+    def get_geolocation(self):
+        """See IReadGeo. Note the output is ordered as (lon, lat, z)."""
+        return self._get_geo_item().coords
+
+    def location_img_url(self, width=500, height=300):
+        """See IReadGeo."""
+        coords = self._get_geo_item().coords
+        if not coords:
+            return ''
+        lon, lat = coords[:2]
+        return utils.location_img_url(lat, lon, width, height)
+
+
+    def _get_geo_item(self):
+        return IGeoItemSimple(self.context)  # XXX should this be self._get_viewedcontent() ?
+
+    def _get_viewedcontent(self):
+        # Subclasses should provide this, to find a potentially more
+        # relevant context than self.context - namely, the thing we
+        # actually want to set/get coordinates on.
+        raise NotImplementedError
+
+
+class WriteGeoViewletBase(ReadGeoViewletBase):
+
+    implements(interfaces.IReadWriteGeo)
 
     def update(self):
         """Save coordinates and any other geo info, if necessary."""
         view = self.__parent__
-        geowriter = get_geo_writer(view)
-        geo_info, locationchanged = geowriter.get_geo_info_from_form()
+        geo_info, locationchanged = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         if errors:
             view.errors.update(errors)
         elif locationchanged:
-            geowriter.save_coords_from_form()
+            self.save_coords_from_form()
             view.add_status_message(_(u'psm_location_changed'))
         
+    def validate(self):
+        """We're inventing a convention that viewlets used in forms
+        can optionally provide a validate() method that returns a dict
+        of error messages; the parent view can do what it likes with these.
 
-class ProjectViewlet(GeoViewlet):
+        This is kind of gunky, but was the most expedient way to
+        integrate with our existing forms.
+        """
+        view = self.__parent__
+        geo_info, locationchanged = self.get_geo_info_from_form()
+        errors = geo_info.get('errors', {})
+        return errors
+
+    def set_geolocation(self, coords):
+        """See IWriteGeo."""
+        if coords and not None in coords:
+            geo = self._get_geo_item()
+            # XXX need to handle things other than a point!
+            lat, lon = coords[:2]
+            # Longitude first! Yes, really.
+            new_coords = (lon, lat, 0.0)
+            if new_coords != geo.coords:
+                geo.setGeoInterface('Point', new_coords)
+                return True
+        return False
+
+    def get_geo_info_from_form(self, form=None, old_info=None):
+        """See IWriteGeo.
+        """
+        if form is None:
+            form = self.request.form
+        if old_info is None:
+            old_info = self.geo_info
+        new_info, changed = utils.update_info_from_form(
+            self.geo_info, form, getToolByName(self.context, 'portal_geocoder'))
+        view = self.__parent__
+        view.errors.update(new_info.get('errors', {}))
+        return new_info, changed
+
+    def save_coords_from_form(self, form=None):
+        """See IWriteGeo."""
+        new_info, changed = self.get_geo_info_from_form(form)
+        lat = new_info.get('position-latitude')
+        lon = new_info.get('position-longitude')
+        if lat == '': lat = None
+        if lon == '': lon = None
+        self.set_geolocation((lat, lon))
+        return new_info, changed
+
+
+
+
+class ProjectViewlet(ReadGeoViewletBase):
+
+    def _get_viewedcontent(self):
+        # Find the project in the acquisition context.
+        # I tried to call self.view.piv.project and .inproject, et al. but
+        # for some reason those return None and False on a closed project.
+        # Instead, we walk the acquisition chain by hand.
+        for item in self.context.aq_inner.aq_chain:
+            if IProject.providedBy(item):
+                return item
+        # If we get here, it typically means we're in eg. the projects
+        # folder because our view is an add view and the project doesn't
+        # exist yet. That's OK, we just won't have as much information.
+        return None
+
+
+class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
     render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
-    
-class MemberProfileViewlet(GeoViewlet):
-
-    render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
-
-    @property
-    def geo_info(self):
-        geo = get_geo_reader(self.__parent__)
-        info = geo.geo_info()
-        # Override the static map image size. Ugh, sucks to have this in code.
-        info['static_img_url'] = geo.location_img_url(width=285, height=285)
-        return info
 
 
-class MemberProfileEditViewlet(MemberProfileViewlet):
+## class MemberProfileViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
+##     render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
+
+##     def geo_info(self):
+##         info = super(MemberProfileViewlet, self).geo_info()
+##         # Override the static map image size. Ugh, sucks to have this in code.
+##         info['static_img_url'] = self.location_img_url(width=285, height=285)
+##         return info
+
+
+##     def _get_viewedcontent(self):
+##         # Find the member in the acquisition context.
+##         for item in self.context.aq_inner.aq_chain:
+##             if IOpenMember.providedBy(item):
+##                 return item
+##         # Not sure when this would happen (creating a member?)
+##         # but it's OK, we just won't have as much information.
+##         return None
+
+
+
+## class MemberProfileEditViewlet(MemberProfileViewlet):
+
+##     render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
 
 
 

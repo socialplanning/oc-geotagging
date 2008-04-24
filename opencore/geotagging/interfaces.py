@@ -1,4 +1,4 @@
-from zope.interface import Interface
+from zope.interface import Interface, Attribute
 
 class IReadGeo(Interface):
     """View for using OpenCore content with geotagging.
@@ -18,10 +18,11 @@ class IReadGeo(Interface):
         """Boolean. True if we can get coordinates, false otherwise.
         """
 
-    def geo_info():
+    geo_info = Attribute(
         """Returns a single dict containing all the interesting stuff.
         XXX more doc
         """
+        )
 
     def has_geocoder():
         """Boolean: Is a PleiadesGeocoder tool available?

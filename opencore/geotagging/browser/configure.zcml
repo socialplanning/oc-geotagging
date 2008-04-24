@@ -29,17 +29,18 @@
      name="project_locationform"
      for="*"
      manager="opencore.project.browser.interfaces.IProjectPrefs"
-     class=".viewlets.ProjectViewlet"
+     class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
      />
 
-  <browser:viewlet
+<!--  <browser:viewlet
      name="member_profileform"
      for="*"
      manager="opencore.member.browser.interfaces.IMemberProfilePrefs"
      class=".viewlets.MemberProfileViewlet"
      permission="zope2.View"
      />
+-->
 
   <browser:viewlet
      name="geo_script_tag"

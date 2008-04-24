@@ -222,6 +222,7 @@ def update_info_from_form(orig_info, form, geocoder):
     elif newtext and newtext != oldtext:
         # If form has an updated position-text and NOT updated coords,
         # geocode it and use the resulting coords.
+        assert geocoder, 'need a working geocoder implementation; got %s' % geocoder
         records = geocoder.geocode(newtext)
         if records:
             newlat, newlon = (records[0]['lat'], records[0]['lon'])
