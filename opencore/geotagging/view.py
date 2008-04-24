@@ -187,6 +187,3 @@ def get_geo_writer(view, context=None):
         raise TypeError("Couldn't adapt %r to IWriteGeoView." % view)
     return wrapper.__of__(context)
 
-# TO DO: To allow opencore to work without this package, put default
-# do-nothing IReadWriteGeo implementation in somewhere like
-# browser/base and the implementations here can override that.
