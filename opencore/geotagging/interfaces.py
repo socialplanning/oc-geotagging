@@ -1,4 +1,3 @@
-from Products.PleiadesGeocoder.interfaces.simple import *
 from zope.interface import Interface
 
 class IReadGeo(Interface):
