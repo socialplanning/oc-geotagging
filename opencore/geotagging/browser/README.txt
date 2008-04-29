@@ -8,7 +8,7 @@ first some setup...
     >>> self.login(project_admin)
     >>> projects = portal.projects
     >>> proj = projects[project_name]
-    >>> view = proj.restrictedTraverse('preferences')
+    >>> prefs_view = proj.restrictedTraverse('preferences')
 
 
 Script tag viewlet
@@ -18,8 +18,8 @@ This provides a way to get the correct google maps javascript url for
 this host.  XXX this relies on the built configuration; need to
 mock up get_config.
 
-    >>> jsviewlet = viewlets.GeoJSViewlet(view.context, view.request, view,
-    ...                                   "irrelevant manager")
+    >>> jsviewlet = viewlets.GeoJSViewlet(prefs_view.context,
+    ...     prefs_view.request, prefs_view, "irrelevant manager")
     >>> jsviewlet.render()
     '<script src="http://..." type="text/javascript"></script>'
 
@@ -30,8 +30,8 @@ Preferences view for Projects
 
 We can wrap a project edit view in a geo-specific viewlet::
 
-    >>> reader = viewlets.ProjectViewlet(view.context, view.request, view,
-    ...                                   "irrelevant manager")
+    >>> reader = viewlets.ProjectViewlet(prefs_view.context,
+    ...    prefs_view.request, prefs_view, "irrelevant manager")
 
 It implements an interface::
 
@@ -48,8 +48,8 @@ Coordinates are empty when not set::
 We have a ProjectEditViewlet that can be used to handle forms and
 store new coords:
 
-    >>> writer = viewlets.ProjectEditViewlet(view.context, view.request, view,
-    ...                                       "irrelevant manager")
+    >>> writer = viewlets.ProjectEditViewlet(prefs_view.context,
+    ...     prefs_view.request, prefs_view, "irrelevant manager") 
 
 It implements these interfaces::
 
@@ -82,7 +82,7 @@ You can set and then view coordinates::
 
     Clear the memoized stuff from the request to see the info.
 
-    >>> utils.clear_all_memos(view)
+    >>> utils.clear_all_memos(prefs_view)
     >>> print writer.geo_info.get('position-latitude')
     11.1
     >>> print writer.geo_info.get('position-longitude')
@@ -112,13 +112,13 @@ You can also pass in a string; if there's no coordinates passed, we
 use a remote service to look them up from this string.  We're using a
 mock so we don't actually hit google on every test run::
 
-    >>> utils.clear_status_messages(view)
+    >>> utils.clear_status_messages(prefs_view)
     >>> form.clear()
     >>> form['position-text'] = "mock address"
     >>> form['location'] = 'mars'
     >>> info, changed = writer.save_coords_from_form(form)
     Called ....geocode('mock address')
-    >>> utils.clear_all_memos(view)  # XXX ugh, wish this wasn't necessary.
+    >>> utils.clear_all_memos(prefs_view)  # XXX ugh, wish this wasn't necessary.
     >>> print writer.geo_info.get('position-latitude')
     12.0
     >>> print writer.geo_info.get('position-longitude')
@@ -144,22 +144,22 @@ We can submit to the preferences view and, since it includes our
 writer viewlet, our information gets stored, including the usual
 archetypes "location" field, for use as a human-readable place name::
 
-    >>> view = proj.restrictedTraverse('preferences')
-    >>> utils.clear_status_messages(view)
-    >>> view.request.form.clear()
-    >>> view.request.form.update({'location': "oceania", 'update': True,
+    >>> prefs_view = proj.restrictedTraverse('preferences')
+    >>> utils.clear_status_messages(prefs_view)
+    >>> prefs_view.request.form.clear()
+    >>> prefs_view.request.form.update({'location': "oceania", 'update': True,
     ...     'project_title': 'IGNORANCE IS STRENGTH',
     ...     'position-text': 'mock address'})
 
-    >>> view.handle_request()
+    >>> prefs_view.handle_request()
     Called ....geocode('mock address')
-    >>> utils.get_status_messages(view)
+    >>> utils.get_status_messages(prefs_view)
     [...u'The location has been changed.'...]
-    >>> view.context.getLocation()
+    >>> prefs_view.context.getLocation()
     'oceania'
-    >>> utils.clear_all_memos(view)
-    >>> reader = viewlets.ProjectViewlet(view.context, view.request, view,
-    ...                                  "irrelevant manager")
+    >>> utils.clear_all_memos(prefs_view)
+    >>> reader = viewlets.ProjectViewlet(prefs_view.context,
+    ...     prefs_view.request, prefs_view, "irrelevant manager")
 
     >>> reader.geo_info.get('position-text')  # saved now.
     'mock address'
@@ -185,4 +185,4 @@ The viewlet includes a bunch of convenient geo-related stuff for UIs::
     'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=500&h=300&zm=9600&cc='
 
 clean up...
-    >>> view.request.form.clear()
+    >>> prefs_view.request.form.clear()
