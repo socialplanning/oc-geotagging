@@ -186,3 +186,43 @@ The viewlet includes a bunch of convenient geo-related stuff for UIs::
 
 clean up...
     >>> prefs_view.request.form.clear()
+
+Create view for Projects
+------------------------
+
+    >>> self.login(project_admin)
+    >>> createview = projects.restrictedTraverse("create")
+
+Looking up geo info on the add view gives us nothing much useful,
+because the project doesn't exist yet::
+
+    >>> reader = viewlets.ProjectViewlet(createview.context,
+    ...    createview.request, createview, 'blah')
+    >>> reader.geo_info['is_geocoded']
+    False
+
+But if you actually submit the project create form, you can see the
+result on the edit view::
+
+    >>> createview.request.form.update({'project_title': 'A geolocated project!',
+    ...    'projid': 'testgeo', 'workflow_policy': 'medium_policy',
+    ...    'position-latitude': '33.33', 'position-longitude': '44.44'})
+    >>> out = createview.handle_request()
+    >>> createview.errors
+    {}
+    >>> prefs_view = projects.restrictedTraverse('testgeo/preferences')
+    >>> utils.clear_all_memos(prefs_view)
+    >>> reader = viewlets.ProjectViewlet(prefs_view.context,
+    ...     prefs_view.request, prefs_view, "irrelevant manager")
+    >>> print reader.geo_info['position-latitude']
+    33.33
+    >>> print reader.geo_info['position-longitude']
+    44.44
+
+Clean that one up...
+
+    >>> projects.manage_delObjects(['testgeo'])
+    >>> prefs_view.request.form.clear()
+
+XXX Add tests for publically available views of projects,
+once they include geo info.

@@ -181,8 +181,16 @@ class ProjectViewlet(ReadGeoViewletBase):
 
 class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
+    title = 'Location'
+    
     render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
+
+class ProjectAddViewlet(ProjectViewlet, WriteGeoViewletBase):
+
+    title = 'Location'
+    
+    render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
 
 ## class MemberProfileViewlet(ReadGeoViewletBase):
@@ -217,6 +225,8 @@ class GeoJSViewlet:
 
     """provides a <script> tag for pages that need geo-related js
     """
+
+    sort_order = 0
 
     def __init__(self, context, request, view, manager):
         self.context = context
