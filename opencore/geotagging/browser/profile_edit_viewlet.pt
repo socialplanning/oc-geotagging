@@ -1,1 +1,5 @@
-TO DO
+<label i18n:translate="profile-edit_location_label" for="location">Location</label> (example: "New York, NY" or "cloud nine")
+<br />
+<input type="text" id="location" name="location" class="oc-autoFocus"
+    tal:attributes="value request/location | memberdata/location;
+                    class python:request.form.get('field') == 'location' and default or nothing" />

@@ -109,6 +109,12 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
             # XXX and yet another google hit...
             self.save_coords_from_form()
             view.add_status_message(_(u'psm_location_changed'))
+
+        # Clean up a bit to avoid archetypes trying to handle our form info.
+        form = self.request.form
+        for key in ('position-latitude', 'position-longitude', 'position-text'):
+            if form.has_key(key):
+                del form[key]
         
     def validate(self):
         """We're inventing a convention that viewlets used in forms
@@ -186,38 +192,26 @@ class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
     render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
 
-class ProjectAddViewlet(ProjectViewlet, WriteGeoViewletBase):
+class MemberProfileViewlet(ReadGeoViewletBase):
 
-    title = 'Location'
-    
-    render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
+    render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
 
-
-## class MemberProfileViewlet(ReadGeoViewletBase):
-
-##     render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
-
-##     def geo_info(self):
-##         info = super(MemberProfileViewlet, self).geo_info()
-##         # Override the static map image size. Ugh, sucks to have this in code.
-##         info['static_img_url'] = self.location_img_url(width=285, height=285)
-##         return info
+    @property
+    def geo_info(self):
+        info = super(MemberProfileViewlet, self).geo_info
+        # Override the static map image size. Ugh, sucks to have this in code.
+        info['static_img_url'] = self.location_img_url(width=285, height=285)
+        return info
 
 
-##     def _get_viewedcontent(self):
-##         # Find the member in the acquisition context.
-##         for item in self.context.aq_inner.aq_chain:
-##             if IOpenMember.providedBy(item):
-##                 return item
-##         # Not sure when this would happen (creating a member?)
-##         # but it's OK, we just won't have as much information.
-##         return None
+    def _get_viewedcontent(self):
+        # Find the member in the acquisition context.
+        return self.__parent__.viewedmember()
 
 
+class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
 
-## class MemberProfileEditViewlet(MemberProfileViewlet):
-
-##     render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
+    render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
 
 
 

@@ -59,13 +59,13 @@ It implements these interfaces::
     True
     >>> verify.verifyObject(geotagging.interfaces.IReadWriteGeo, writer)
     True
+
+If we save an empty form, nothing changes::
+
     >>> writer.geo_info.get('position-latitude')
     ''
     >>> writer.geo_info.get('position-longitude')
     ''
-
-If we save an empty form, nothing changes::
-
     >>> form = {}
     >>> info, changed = writer.save_coords_from_form(form)
     >>> changed
@@ -346,3 +346,115 @@ And a separate view that generates kml markup::
     <coordinates>-87.000000,12.000000,0.000000</coordinates>
     </Point>...
     </kml>
+
+
+Profile edit views for Members
+------------------------------
+
+We can wrap a profile edit view in a geo-specific viewlet::
+
+    >>> people = portal.people
+    >>> m1 = people.m1
+    >>> self.login('m1')
+    >>> prof_view = m1.restrictedTraverse('@@profile-edit')
+    >>> prof_view.request.form.clear()
+    >>> reader = viewlets.MemberProfileViewlet(prof_view.context,
+    ...     prof_view.request, prof_view, 'irrelevant')
+    >>> pprint(reader.geo_info)
+    {'is_geocoded': False,
+     'location': '',
+     'position-latitude': '',
+     'position-longitude': '',
+     'position-text': '',
+     'static_img_url': ''}
+    
+We have an edit viewlet that can be used to handle forms and
+store new coords::
+
+    >>> writer = viewlets.MemberProfileEditViewlet(prof_view.context,
+    ...     prof_view.request, prof_view, "irrelevant manager") 
+
+It implements these interfaces::
+
+    >>> verify.verifyObject(geotagging.interfaces.IReadGeo, writer)
+    True
+    >>> verify.verifyObject(geotagging.interfaces.IWriteGeo, writer)
+    True
+    >>> verify.verifyObject(geotagging.interfaces.IReadWriteGeo, writer)
+    True
+
+If we save an empty form, nothing changes::
+
+    >>> writer.geo_info.get('position-latitude')
+    ''
+    >>> writer.geo_info.get('position-longitude')
+    ''
+    >>> form = {}
+    >>> info, changed = writer.save_coords_from_form(form)
+    >>> changed
+    []
+    >>> writer.geo_info.get('position-latitude')
+    ''
+    >>> writer.geo_info.get('position-longitude')
+    ''
+
+You can set and then view coordinates::
+
+    >>> writer.set_geolocation((88.88, -77.77))
+    True
+
+    Clear the memoized stuff from the request to see the info.
+
+    >>> utils.clear_all_memos(prof_view)
+    >>> print reader.geo_info.get('position-latitude')
+    88.88
+    >>> print reader.geo_info.get('position-longitude')
+    -77.77
+
+Submitting the profile edit form updates everything, and we get a
+static image url now::
+
+    >>> prof_view.request.form.update({'position-latitude': 45.0,
+    ...  'position-longitude': 0.0, 'location': 'somewhere', })
+    >>> redirected = prof_view.handle_form()
+    >>> utils.clear_all_memos(prof_view)
+    >>> pprint(reader.geo_info)
+    {'is_geocoded': True,
+     'location': 'somewhere',
+     'position-latitude': 45.0,
+     'position-longitude': 0.0,
+     'position-text': '',
+     'static_img_url': 'http://...'}
+
+Submitting the form with position-text should cause the (mock)
+geocoder to be used::
+
+    >>> prof_view = m1.restrictedTraverse('@@profile-edit')
+    >>> prof_view.request.form.clear()
+    >>> reader = viewlets.MemberProfileViewlet(prof_view.context,
+    ...     prof_view.request, prof_view, 'irrelevant')
+    >>> prof_view.request.form.update({'position-text': 'atlantis',
+    ...     'location': 'somewhere underwater', })
+    >>> redirected = prof_view.handle_form()
+    Called ...geocode('atlantis')
+
+    >>> utils.clear_all_memos(prof_view)  # XXX Ugh, make this unnecessary.
+    >>> pprint(reader.geo_info)
+    {'is_geocoded': True,
+     'location': 'somewhere underwater',
+     'position-latitude': 12.0,
+     'position-longitude': -87.0,
+     'position-text': 'atlantis',
+     'static_img_url': 'http://...'}
+
+
+The public profile view should show the same data::
+
+    >>> self.logout()
+    >>> pview = m1.restrictedTraverse('@@profile')
+    >>> pview.request.form.clear()
+    >>> pviewlet = viewlets.MemberProfileViewlet(pview.context, pview.request,
+    ...                                 pview, "irrelevant manager")
+    >>> pviewlet.geo_info == reader.geo_info
+    True
+    

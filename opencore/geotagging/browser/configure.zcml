@@ -25,6 +25,8 @@
      name="kml"
      />
 
+  <!-- Viewlets to plug into various forms in the opencore UI -->
+
   <browser:viewlet
      name="project_locationform"
      for="*"
@@ -33,14 +35,13 @@
      permission="zope2.View"
      />
 
-<!--  <browser:viewlet
+  <browser:viewlet
      name="member_profileform"
      for="*"
      manager="opencore.member.browser.interfaces.IMemberProfilePrefs"
-     class=".viewlets.MemberProfileViewlet"
+     class=".viewlets.MemberProfileEditViewlet"
      permission="zope2.View"
      />
--->
 
   <browser:viewlet
      name="geo_script_tag"
@@ -49,4 +50,5 @@
      class=".viewlets.GeoJSViewlet"
      permission="zope2.View"
      />
+
 </configure>
