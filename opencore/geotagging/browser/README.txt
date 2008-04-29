@@ -3,16 +3,33 @@
 Geocoding views of opencore content
 ===================================
 
+first some setup...
+
+    >>> self.login(project_admin)
+    >>> projects = portal.projects
+    >>> proj = projects[project_name]
+    >>> view = proj.restrictedTraverse('preferences')
+
+
+Script tag viewlet
+------------------
+
+This provides a way to get the correct google maps javascript url for
+this host.  XXX this relies on the built configuration; need to
+mock up get_config.
+
+    >>> jsviewlet = viewlets.GeoJSViewlet(view.context, view.request, view,
+    ...                                   "irrelevant manager")
+    >>> jsviewlet.render()
+    '<script src="http://..." type="text/javascript"></script>'
+
+
 
 Preferences view for Projects
 ------------------------------
 
 We can wrap a project edit view in a geo-specific viewlet::
 
-    >>> self.login(project_admin)
-    >>> projects = portal.projects
-    >>> proj = projects[project_name]
-    >>> view = proj.restrictedTraverse('preferences')
     >>> reader = viewlets.ProjectViewlet(view.context, view.request, view,
     ...                                   "irrelevant manager")
 
@@ -123,3 +140,49 @@ the form handler, not just our wrapper viewlet.
     >>> writer.geo_info['location'] == form['location']
     False
 
+We can submit to the preferences view and, since it includes our
+writer viewlet, our information gets stored, including the usual
+archetypes "location" field, for use as a human-readable place name::
+
+    >>> view = proj.restrictedTraverse('preferences')
+    >>> utils.clear_status_messages(view)
+    >>> view.request.form.clear()
+    >>> view.request.form.update({'location': "oceania", 'update': True,
+    ...     'project_title': 'IGNORANCE IS STRENGTH',
+    ...     'position-text': 'mock address'})
+
+    >>> view.handle_request()
+    Called ....geocode('mock address')
+    >>> utils.get_status_messages(view)
+    [...u'The location has been changed.'...]
+    >>> view.context.getLocation()
+    'oceania'
+    >>> utils.clear_all_memos(view)
+    >>> reader = viewlets.ProjectViewlet(view.context, view.request, view,
+    ...                                  "irrelevant manager")
+
+    >>> reader.geo_info.get('position-text')  # saved now.
+    'mock address'
+
+The viewlet includes a bunch of convenient geo-related stuff for UIs::
+
+    >>> sorted(reader.geo_info.keys())
+    ['is_geocoded', 'location', 'position-latitude', 'position-longitude', 'position-text', 'static_img_url']
+    >>> reader.geo_info['is_geocoded']
+    True
+
+    >>> reader.geo_info['location']
+    'oceania'
+
+    >>> round(reader.geo_info['position-latitude'])
+    12.0
+    >>> round(reader.geo_info['position-longitude'])
+    -87.0
+
+    >>> reader.geo_info['position-text']
+    'mock address'
+    >>> reader.geo_info['static_img_url']
+    'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=500&h=300&zm=9600&cc='
+
+clean up...
+    >>> view.request.form.clear()

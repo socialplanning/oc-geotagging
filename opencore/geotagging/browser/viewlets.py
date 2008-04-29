@@ -34,7 +34,7 @@ class ReadGeoViewletBase(ViewletBase):
         """See IReadGeo"""
         info = {'static_img_url': self.location_img_url(),
                 'is_geocoded': self.is_geocoded(),
-                } #'maps_script_url': self._maps_script_url()}
+                }
         content = self._get_viewedcontent()
         info['location'] = content and content.getLocation() or ''
         info['position-text'] = content and content.getPositionText() or ''
@@ -218,8 +218,15 @@ class GeoJSViewlet:
     """provides a <script> tag for pages that need geo-related js
     """
 
-    sort_order = 100
-    
+    def __init__(self, context, request, view, manager):
+        self.context = context
+        self.request = request
+        self.__parent__ = self.view = view
+        self.manager = manager
+
+    def update(self):
+        pass
+
     def render(self):
         url = self.request['ACTUAL_URL']
         # In python 2.5, this could be written as urlparse(url).hostname
