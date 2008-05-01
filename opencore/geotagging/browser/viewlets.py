@@ -101,16 +101,22 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         """Save form data, if changed."""
         view = self.__parent__
         # XXX we've already geocoded in validate(), don't hit google twice!
-        geo_info, locationchanged = self.get_geo_info_from_form()
+        geo_info, changes = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         if errors:
             view.errors.update(errors)
-        elif locationchanged:
+        elif changes:
             # XXX and yet another google hit...
             self.save_coords_from_form()
+            if 'position-text' in changes:
+                # This should be implicitly handled by our archetypes schema,
+                # but for some reason it's not; so, be explicit.
+                pos = geo_info['position-text']
+                self._get_viewedcontent().setPositionText(pos)
             view.add_status_message(_(u'psm_location_changed'))
-
-        # Clean up a bit to avoid archetypes trying to handle our form info.
+            
+        # Clean up a bit to avoid archetypes trying to handle our form
+        # info.
         form = self.request.form
         for key in ('position-latitude', 'position-longitude', 'position-text'):
             if form.has_key(key):
@@ -125,7 +131,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         integrate with our existing forms.
         """
         view = self.__parent__
-        geo_info, locationchanged = self.get_geo_info_from_form()
+        geo_info, changed = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         self.new_info = geo_info
         return errors
