@@ -458,3 +458,89 @@ The public profile view should show the same data::
     >>> pviewlet.geo_info == reader.geo_info
     True
     
+
+Feeds for Members
+------------------
+
+A bit of setup here to avoid depending on previous tests, yuck::
+
+    >>> self.login('m1')
+    >>> edit = m1.restrictedTraverse('profile-edit')
+    >>> edit.request.form.clear()
+    >>> edit.request.form.update({'location': 'nowhere', 'position-latitude': -66.0,
+    ...      'position-longitude': 55.0})
+
+    >>> redirected = edit.handle_form()
+
+
+First try the views that generate info, should be public::
+
+    >>> self.logout()
+    >>> view = people.restrictedTraverse('@@geo')
+    >>> info = list(view.forRSS())
+    >>> len(info)
+    1
+    >>> pprint(info)
+    [{'coords_georss': '-66.000000 55.000000',
+      'geometry': {'type': 'Point', 'coordinates': (55.0, -66.0, 0.0)},
+      'hasLineString': 0,
+      'hasPoint': 1,
+      'hasPolygon': 0,
+      'id': 'm1',
+      'properties': {...}}]
+    >>> pprint(info[0]['properties'])
+    {'created': '...-...-...T...:...:...',
+     'description': 'No description',
+     'language': '',
+     'link': 'http://nohost/plone/people/m1',
+     'location': 'nowhere',
+     'title': 'Member One',
+     'updated': '...-...-...T...:...:...'}
+
+
+And similar info for generating kml::
+
+    >>> info = list(view.forKML())
+    >>> len(info)
+    1
+    >>> pprint(info)
+    [{'coords_kml': '55.000000,-66.000000,0.000000',...
+
+
+Now the actual georss xml feed::
+
+    >>> feedview = portal.people.restrictedTraverse('@@georss')
+    >>> xml = get_response_output(feedview)
+    >>> lines = [s.strip() for s in xml.split('\n') if s.strip()]
+    >>> print '\n'.join(lines)
+    <?xml version="1.0"...
+    <title>People</title>
+    <link rel="self" href="http://nohost/plone/people"/>...
+    <id>http://nohost/plone/people</id>
+    <entry>
+    <title>Member One</title>...
+    <updated>...-...-...T...:...:...</updated>...
+    <georss:where><gml:Point>
+    <gml:pos>-66.000000 55.000000</gml:pos>
+    </gml:Point>...
+
+
+Now the actual kml feed::
+
+    >>> feedview = portal.people.restrictedTraverse('@@kml')
+    >>> xml = feedview()
+    >>> lines = [s.strip() for s in xml.split('\n') if s.strip()]
+    >>> print '\n'.join(lines)
+    <?xml...
+    <kml xmlns="http://earth.google.com/kml/2.1">
+    <Document>...
+    <name>People</name>...
+    <Placemark>
+    <name>Member One</name>
+    <description>...
+    <p>URL:
+    <a href="http://nohost/plone/people/m1">http://nohost/plone/people/m1</a>...
+    <Point>
+    <coordinates>55.000000,-66.000000,0.000000</coordinates>
+    </Point>...
+    </kml>
