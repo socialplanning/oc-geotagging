@@ -51,4 +51,11 @@
      permission="zope2.View"
      />
 
+  <!-- used for the project prefs page behaviors magic -->
+  <browser:resource
+     name="location.json"
+     file="location.json"
+     />
+
+
 </configure>
