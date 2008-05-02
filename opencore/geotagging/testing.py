@@ -3,6 +3,7 @@ from Products.PleiadesGeocoder.geocode import Geocoder
 from opencore.testing import setup as oc_setup
 from opencore.testing.minimock import Mock
 from zope.app.component.hooks import setSite, setHooks
+from zope.app.component.interfaces import ISite
 
 mock_geocode = Mock(
         'Products.PleiadesGeocoder.geocode.Geocoder.geocode')
@@ -41,7 +42,8 @@ def restore_geocoder():
 
 def readme_setup(tc):
     oc_setup.fresh_skin(tc)
-    enableLocalSiteHook(tc.portal)
+    if not ISite.providedBy(tc.portal):
+        enableLocalSiteHook(tc.portal)
     setSite(tc.portal)
     setHooks()
     setup_mock_geocoder()
