@@ -27,9 +27,9 @@
                   <td id="position-input" class="oc-form-value oc-form-fieldBlock">
                     <input type="text" id="position-text" name="position-text"
                            tal:attributes="value view/geo_info/position-text | nothing" />  (example: "349 w 12th st, ny, ny")
-		      <p tal:condition="view/geo_info/static_img_url | nothing">
-			<img tal:attributes="src view/geo_info/static_img_url" class="oc-map" />
-		      </p>
+		      <noscript><p tal:condition="view/geo_info/static_img_url | nothing">
+			<noscript><img tal:attributes="src view/geo_info/static_img_url" class="oc-map" />
+		      </p></noscript>
                   </td>
                   <td class="oc-form-help">
                     <span class="oc-form-context"></span>
