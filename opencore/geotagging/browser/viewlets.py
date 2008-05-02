@@ -47,17 +47,6 @@ class ReadGeoViewletBase(ViewletBase):
         info['position-longitude'] = lon
         return info
 
-##     @property
-##     def geo_info(self):
-##         """geo information for display in forms;
-##         takes values from request, falls back to existing project
-##         if possible."""
-##         # I suspect these viewlets are going to totally replace the
-##         # stuff in geotagging/view.py; right now, just trying to get
-##         # tests passing again.
-##         geo = get_geo_reader(self.__parent__)
-##         return geo.geo_info()
-
     def has_geocoder(self):
         """See IReadGeo. Is a PleiadesGeocoder tool available?
         """
