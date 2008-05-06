@@ -4,12 +4,12 @@ from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.Five.viewlet.viewlet import ViewletBase
 from opencore.browser.base import _
-from opencore.configuration.utils import get_config
 from opencore.geotagging import interfaces
 from opencore.geotagging import utils
 from opencore.interfaces import IProject
-from opencore.member.interfaces import IOpenMember
+from opencore.utility.interfaces import IProvideSiteConfig
 from urlparse import urlparse
+from zope.component import getUtility
 from zope.interface import implements
 
 class ReadGeoViewletBase(ViewletBase):
@@ -227,11 +227,17 @@ class GeoJSViewlet:
         pass
 
     def render(self):
+        # We have a map key for each possible hostname in build.ini.
         url = self.request['ACTUAL_URL']
         # In python 2.5, this could be written as urlparse(url).hostname
         hostname = urlparse(url)[1].split(':')[0]
-        # We have a map key for each possible hostname in build.ini.
-        key = get_config('google_maps_keys', hostname)
+        config = getUtility(IProvideSiteConfig)
+        # fassemblerconfigparser magically flattens the build.ini into
+        # one big namespace, so we can just hope it'll find the
+        # hostname in the google_maps_keys section... this works as
+        # long as your hostname isn't something like # 'opencore_site_id'
+        # ... Really this means our build.ini is getting a bit overloaded.
+        key = config.get(hostname)
         if not key:
             warnings.warn("need a google maps key for %r" % hostname)
             return ''

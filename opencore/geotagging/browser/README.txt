@@ -15,13 +15,13 @@ Script tag viewlet
 ------------------
 
 This provides a way to get the correct google maps javascript url for
-this host.  XXX this relies on the built configuration; need to
-mock up get_config.
+this host.
 
+    >>> getUtility(IProvideSiteConfig)._set('bogusKey')
     >>> jsviewlet = viewlets.GeoJSViewlet(prefs_view.context,
     ...     prefs_view.request, prefs_view, "irrelevant manager")
     >>> jsviewlet.render()
-    '<script src="http://..." type="text/javascript"></script>'
+    '<script src="http://...&key=bogusKey..." type="text/javascript"></script>'
 
 
 

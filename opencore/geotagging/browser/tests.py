@@ -25,6 +25,7 @@ def test_suite():
     from zope.component import getUtility
     from zope.interface import alsoProvides, verify
     from Products.PleiadesGeocoder.interfaces import IGeoItemSimple
+    from opencore.utility.interfaces import IProvideSiteConfig
     import pdb
 
     installProduct('PleiadesGeocoder')
