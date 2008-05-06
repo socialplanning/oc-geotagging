@@ -21,8 +21,6 @@ def test_suite():
          IGeoreferenceable, IGeoAnnotatableContent, IGeoserializable, \
          IGeoserializableMembersFolder
     from opencore.geotagging.interfaces import IReadGeo, IWriteGeo, IReadWriteGeo
-    #from opencore.geotagging.view import get_geo_reader
-    #from opencore.geotagging.view import get_geo_writer
     ZopeTestCase.installProduct('PleiadesGeocoder')
     setup.setupPloneSite()
 
