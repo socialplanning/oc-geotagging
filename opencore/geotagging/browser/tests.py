@@ -15,11 +15,8 @@ def test_suite():
     from Products.PloneTestCase import setup
     from Products.PloneTestCase.PloneTestCase import FunctionalTestCase
     from Testing.ZopeTestCase import installProduct
-    from opencore.geotagging.view import get_geo_writer
     from opencore.geotagging.browser import viewlets
     from opencore import geotagging
-    #from opencore.geotagging.browser.viewlets import MemberProfileViewlet
-    #from opencore.geotagging.browser.viewlets import MemberProfileEditViewlet 
     from opencore.testing import utils
     from pprint import pprint
     from zope.component import getUtility

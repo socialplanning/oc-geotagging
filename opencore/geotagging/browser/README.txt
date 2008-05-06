@@ -44,6 +44,13 @@ Coordinates are empty when not set::
     ''
     >>> reader.geo_info.get('position-longitude')
     ''
+    >>> print reader.get_geolocation()
+    None
+    >>> print reader.is_geocoded()
+    False
+    >>> reader.location_img_url()
+    ''
+
 
 We have a ProjectEditViewlet that can be used to handle forms and
 store new coords:
@@ -77,7 +84,7 @@ If we save an empty form, nothing changes::
 
 You can set and then view coordinates::
 
-    >>> writer.set_geolocation((11.1, -22.2))
+    >>> writer.set_geolocation((11.1, -22.2))  # XXX lat first, change that?
     True
 
     Clear the memoized stuff from the request to see the info.
@@ -87,6 +94,9 @@ You can set and then view coordinates::
     11.1
     >>> print writer.geo_info.get('position-longitude')
     -22.2
+    >>> writer.is_geocoded(), reader.is_geocoded()
+    (True, True)
+
 
 Calling again with the same points makes no change:
 
@@ -97,9 +107,13 @@ Our read-only viewlet can see the changes we've made::
 
     >>> reader.geo_info == writer.geo_info
     True
+    >>> reader.location_img_url()
+    'http://maps.google.com/...'
+    >>> reader.get_geolocation() == (-22.2, 11.1, 0.0)
+    True
 
 
-You can extract stuff from the form::
+You can extract stuff from the form without saving::
 
     >>> form = {'position-latitude': '10.0', 'position-longitude': '-20.0'}
     >>> info, changed = writer.get_geo_info_from_form(form)
@@ -107,6 +121,40 @@ You can extract stuff from the form::
     True
     >>> info['position-longitude'] == float(form['position-longitude'])
     True
+
+No change with an empty form::
+
+    >>> prefs_view.request.form.clear()
+    >>> info, changed = writer.get_geo_info_from_form()
+    >>> info == writer.geo_info
+    True
+    >>> changed
+    []
+
+get_geo_info_from_form has no side effects:
+
+    >>> prefs_view.request.form.clear()
+    >>> reader.get_geolocation() == (-22.2, 11.1, 0.0)
+    True
+
+The request overrides the values returned by get_geo_info_from_form,
+but not geo_info:
+
+    >>> old_info = reader.geo_info.copy()
+    >>> prefs_view.request.form.update({'location': 'nunya bizness',
+    ...     'position-latitude': 1.2, 'position-longitude': 3.4,
+    ...     'position-text': 'my house',  'static_img_url': 'IGNORED',
+    ...     'maps_script_url': 'IGNORED'})
+    >>> info, changed = writer.get_geo_info_from_form()
+    >>> info == old_info
+    False
+    >>> info['location']
+    'nunya bizness'
+    >>> print info['position-latitude'], info['position-longitude']
+    1.2 3.4
+    >>> info['position-text']
+    'my house'
+
 
 You can also pass in a string; if there's no coordinates passed, we
 use a remote service to look them up from this string.  We're using a
@@ -130,10 +178,10 @@ Our read-only viewlet can see the changes we've made::
     >>> reader.geo_info == writer.geo_info
     True
 
-But we let the content's own form handlers handle everything else; we
-might want to revisit this, it feels kind of schizo.  For now, this
-means that other things in the request aren't saved unless we invoke
-the form handler, not just our wrapper viewlet.
+But we let the content's own form handlers handle everything else.
+XXX We might want to revisit this, it feels kind of schizo.
+For now, this means that other things in the request aren't saved
+unless we invoke the form handler, not just our wrapper viewlet.
 
     >>> writer.geo_info['position-text'] == form['position-text']
     False
@@ -141,8 +189,9 @@ the form handler, not just our wrapper viewlet.
     False
 
 We can submit to the preferences view and, since it includes our
-writer viewlet, our information gets stored, including the usual
-archetypes "location" field, for use as a human-readable place name::
+writer viewlet and calls its save method, our information gets stored;
+including the usual archetypes "location" field, for use as a
+human-readable place name::
 
     >>> prefs_view = proj.restrictedTraverse('preferences')
     >>> utils.clear_status_messages(prefs_view)
@@ -410,6 +459,8 @@ You can set and then view coordinates::
     88.88
     >>> print reader.geo_info.get('position-longitude')
     -77.77
+    >>> reader.get_geolocation() == (reader.geo_info['position-longitude'], reader.geo_info['position-latitude'], 0.0)
+    True
 
 Submitting the profile edit form updates everything, and we get a
 static image url now::
@@ -458,6 +509,26 @@ The public profile view should show the same data::
     >>> pviewlet.geo_info == reader.geo_info
     True
     
+
+Request values affect get_geo_info_from_form but not geo_info:
+
+    >>> old_info = reader.geo_info.copy()
+    >>> prof_view.request.form.update({'position-latitude': 45.0,
+    ...  'position-longitude': 0.0, 'location': 'somewhere', })
+
+    >>> info, changed = writer.get_geo_info_from_form()
+    >>> info == old_info
+    False
+    >>> sorted(changed)
+    ['location', 'position-latitude', 'position-longitude', 'static_img_url']
+    >>> pprint(info)
+    {'is_geocoded': True,
+     'location': 'somewhere',
+     'position-latitude': 45.0,
+     'position-longitude': 0.0,
+     'position-text': 'atlantis',
+     'static_img_url': 'http://maps...'}
+
 
 Feeds for Members
 ------------------
