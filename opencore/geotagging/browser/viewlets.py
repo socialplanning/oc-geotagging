@@ -47,12 +47,6 @@ class ReadGeoViewletBase(ViewletBase):
         info['position-longitude'] = lon
         return info
 
-    def has_geocoder(self):
-        """See IReadGeo. Is a PleiadesGeocoder tool available?
-        """
-        # XXX Is this still used anywhere?
-        return getToolByName(self.context, 'portal_geocoder', None) is not None
-
     def get_geolocation(self):
         """See IReadGeo. Note the output is ordered as (lon, lat, z)."""
         return self._get_geo_item().coords

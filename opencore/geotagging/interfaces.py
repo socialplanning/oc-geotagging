@@ -23,11 +23,6 @@ class IReadGeo(Interface):
         XXX more doc
         """
         )
-
-    def has_geocoder():
-        """Boolean: Is a PleiadesGeocoder tool available?
-        """
-        
         
 
 
