@@ -66,7 +66,6 @@ class ReadGeoViewletBase(ViewletBase):
 
 
     def _get_geo_item(self):
-        #return IGeoItemSimple(self.context)  # XXX should this be self._get_viewedcontent() ?
         return IGeoItemSimple(self._get_viewedcontent())
 
     def _get_viewedcontent(self):
