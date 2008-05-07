@@ -42,7 +42,9 @@ class IWriteGeo(Interface):
         """
 
     def set_geolocation(coords):
-        """Store coordinates on the context (latitude first).
+        """Store coordinates on the context, as a tuple of (lon, lat, z).
+        (the z coord is optional; default is 0.0).
+
         If a change is made, return True; else return False.
         """
 

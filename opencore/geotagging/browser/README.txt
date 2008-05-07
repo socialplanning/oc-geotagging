@@ -84,7 +84,7 @@ If we save an empty form, nothing changes::
 
 You can set and then view coordinates::
 
-    >>> writer.set_geolocation((11.1, -22.2))  # XXX lat first, change that?
+    >>> writer.set_geolocation((-22.2, 11.1))  # longitude first
     True
 
     Clear the memoized stuff from the request to see the info.
@@ -100,7 +100,7 @@ You can set and then view coordinates::
 
 Calling again with the same points makes no change:
 
-    >>> writer.set_geolocation((11.1, -22.2))
+    >>> writer.set_geolocation((-22.2, 11.1))
     False
 
 Our read-only viewlet can see the changes we've made::
@@ -449,7 +449,7 @@ If we save an empty form, nothing changes::
 
 You can set and then view coordinates::
 
-    >>> writer.set_geolocation((88.88, -77.77))
+    >>> writer.set_geolocation((-77.77, 88.88))
     True
 
     Clear the memoized stuff from the request to see the info.

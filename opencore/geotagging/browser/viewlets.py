@@ -124,11 +124,10 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         if coords and not None in coords:
             geo = self._get_geo_item()
             # XXX need to handle things other than a point!
-            lat, lon = coords[:2]
-            # Longitude first! Yes, really.
-            new_coords = (lon, lat, 0.0)
-            if new_coords != geo.coords:
-                geo.setGeoInterface('Point', new_coords)
+            if len(coords) == 2:
+                coords = coords + (0.0,)
+            if coords != geo.coords:
+                geo.setGeoInterface('Point', coords)
                 return True
         return False
 
@@ -152,7 +151,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         lon = new_info.get('position-longitude')
         if lat == '': lat = None
         if lon == '': lon = None
-        self.set_geolocation((lat, lon))
+        self.set_geolocation((lon, lat))
         return new_info, changed
 
 
