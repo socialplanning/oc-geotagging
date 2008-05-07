@@ -14,11 +14,16 @@ from zope.interface import implements
 
 class ReadGeoViewletBase(ViewletBase):
 
+    """This can be added to a page to show geo info about the context.
+    """
+
     sort_order = 123  # we'll sort this out later. HA HA I FUNNY
 
     implements(interfaces.IReadGeo)
 
     def update(self):
+        """we're not using update; does that mean viewlets are a poor choice?
+        """
         pass
 
     def render(self):
@@ -61,7 +66,8 @@ class ReadGeoViewletBase(ViewletBase):
 
 
     def _get_geo_item(self):
-        return IGeoItemSimple(self.context)  # XXX should this be self._get_viewedcontent() ?
+        #return IGeoItemSimple(self.context)  # XXX should this be self._get_viewedcontent() ?
+        return IGeoItemSimple(self._get_viewedcontent())
 
     def _get_viewedcontent(self):
         # Subclasses should provide this, to find a potentially more
@@ -72,13 +78,12 @@ class ReadGeoViewletBase(ViewletBase):
 
 class WriteGeoViewletBase(ReadGeoViewletBase):
 
+    """This can be added to a form to add a widget for setting the context's location.
+    """
     implements(interfaces.IReadWriteGeo)
 
     new_info = None
 
-    def update(self):
-        """hmm, what should this do?"""
-        pass
 
     def save(self):
         """Save form data, if changed."""
