@@ -228,12 +228,15 @@ class GeoJSViewlet:
         url = self.request['ACTUAL_URL']
         # In python 2.5, this could be written as urlparse(url).hostname
         hostname = urlparse(url)[1].split(':')[0]
-        config = getUtility(IProvideSiteConfig)
+        # Google maps key for a domain can be used for any subdomain.
+        # So we should register them for our domains, not subdomains.
+        hostname = '.'.join(hostname.split('.')[-2:])
         # fassemblerconfigparser magically flattens the build.ini into
         # one big namespace, so we can just hope it'll find the
         # hostname in the google_maps_keys section... this works as
         # long as your hostname isn't something like # 'opencore_site_id'
         # ... Really this means our build.ini is getting a bit overloaded.
+        config = getUtility(IProvideSiteConfig)
         key = config.get(hostname)
         if not key:
             warnings.warn("need a google maps key for %r" % hostname)
