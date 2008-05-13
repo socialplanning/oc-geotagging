@@ -15,15 +15,14 @@ def test_suite():
     from Products.PloneTestCase import setup
     from Products.PloneTestCase.PloneTestCase import FunctionalTestCase
     from Testing.ZopeTestCase import installProduct
-    from opencore.geotagging.view import get_geo_writer
-    from opencore.geotagging.browser.viewlets import ProjectViewlet
-    from opencore.geotagging.browser.viewlets import MemberProfileViewlet
-    from opencore.geotagging.browser.viewlets import MemberProfileEditViewlet 
+    from opencore.geotagging.browser import viewlets
+    from opencore import geotagging
     from opencore.testing import utils
     from pprint import pprint
     from zope.component import getUtility
-    from zope.interface import alsoProvides
+    from zope.interface import alsoProvides, verify
     from Products.PleiadesGeocoder.interfaces import IGeoItemSimple
+    from opencore.utility.interfaces import IProvideSiteConfig
     import pdb
 
     installProduct('PleiadesGeocoder')

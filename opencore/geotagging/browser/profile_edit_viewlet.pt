@@ -1,1 +1,6 @@
-TO DO
+<label i18n:translate="profile-edit_location_label" for="location">Location</label> (example: "New York, NY" or "cloud nine")
+<br />
+<!-- needs to be modified to match the new spec w/ a map and everything... -->
+<input type="text" id="location" name="position-text" class="oc-autoFocus"
+    tal:attributes="value request/position-text | view/geo_info/position-text;
+                    class python:request.form.get('field') == 'location' and default or nothing" />

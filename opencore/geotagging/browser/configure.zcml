@@ -25,11 +25,13 @@
      name="kml"
      />
 
+  <!-- Viewlets to plug into various forms in the opencore UI -->
+
   <browser:viewlet
      name="project_locationform"
      for="*"
      manager="opencore.project.browser.interfaces.IProjectPrefs"
-     class=".viewlets.ProjectViewlet"
+     class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
      />
 
@@ -37,7 +39,7 @@
      name="member_profileform"
      for="*"
      manager="opencore.member.browser.interfaces.IMemberProfilePrefs"
-     class=".viewlets.MemberProfileViewlet"
+     class=".viewlets.MemberProfileEditViewlet"
      permission="zope2.View"
      />
 
@@ -48,4 +50,13 @@
      class=".viewlets.GeoJSViewlet"
      permission="zope2.View"
      />
+
+  <!-- XXX we don't need this anymore -->
+  <!-- used for the project prefs page behaviors magic -->
+  <browser:resource
+     name="location.json"
+     file="location.json"
+     />
+
+
 </configure>

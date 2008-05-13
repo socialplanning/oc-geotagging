@@ -17,13 +17,10 @@ def test_suite():
     from opencore.project.browser.base import ProjectBaseView
     from opencore.member.browser.view import ProfileView
     from pprint import pprint
-    from Products.PleiadesGeocoder.interfaces import IGeoItemSimple
-    from opencore.geotagging.interfaces import IGeoFolder, \
-         IReadGeo, IWriteGeo, IReadWriteGeo, \
+    from Products.PleiadesGeocoder.interfaces import IGeoItemSimple, IGeoFolder,\
          IGeoreferenceable, IGeoAnnotatableContent, IGeoserializable, \
          IGeoserializableMembersFolder
-    from opencore.geotagging.view import get_geo_reader
-    from opencore.geotagging.view import get_geo_writer
+    from opencore.geotagging.interfaces import IReadGeo, IWriteGeo, IReadWriteGeo
     ZopeTestCase.installProduct('PleiadesGeocoder')
     setup.setupPloneSite()
 
@@ -37,20 +34,11 @@ def test_suite():
                                   setUp=hook_setup,
                                   layer=test_layer
                                   )
-    readme = dtf.ZopeDocFileSuite("README.txt",
-                                  optionflags=optionflags,
-                                  package='opencore.geotagging',
-                                  test_class=OpenPlansTestCase,
-                                  globs = globs,
-                                  setUp=readme_setup,
-                                  tearDown=readme_teardown,
-                                  layer=test_layer
-                                  )
     utilsunit = doctest.DocTestSuite('opencore.geotagging.utils',
                                      optionflags=optionflags)
     return unittest.TestSuite((utilsunit,
                                config,
-                               readme,))
+                               ))
 
 
 if __name__ == '__main__':

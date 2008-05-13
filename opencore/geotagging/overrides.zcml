@@ -5,7 +5,8 @@
     >
 
   <!-- We do NOT want to use the more complex member-folder-specific
-       view that Pleiades registers. Could write a setup profile that
+       @@geo view that Pleiades registers; instead, because we're using Remember,
+       we want the generic folder @@geo view.  Could write a setup profile that
        removes the marker interface they added, but this is easier. -->
 
   <browser:page  

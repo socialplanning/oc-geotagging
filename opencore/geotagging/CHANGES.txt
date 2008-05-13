@@ -1,0 +1,13 @@
+0.2  released 2008-05-13
+================================
+
+* Project UI works, slightly simplified.
+* Member profile UI still needs redoing.
+* Implementation moved into viewlets.
+
+0.1  initial dev internal release
+=================================
+
+* This used to be a sub-package of opencore, at ttps://svn.openplans.org/svn/opencore/trunk/opencore/geocoding
+* Things basically work.
+
