@@ -17,7 +17,7 @@ Script tag viewlet
 This provides a way to get the correct google maps javascript url for
 this host.
 
-    >>> getUtility(IProvideSiteConfig)._set('bogusKey')
+    >>> getUtility(IProvideSiteConfig)._set('nohost', 'bogusKey')
     >>> jsviewlet = viewlets.GeoJSViewlet(prefs_view.context,
     ...     prefs_view.request, prefs_view, "irrelevant manager")
     >>> jsviewlet.render()
