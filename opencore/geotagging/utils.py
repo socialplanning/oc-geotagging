@@ -107,7 +107,6 @@ def update_info_from_form(orig_info, form, geocoder):
     A bit of test setup::
 
     >>> orig = {'position-latitude': '', 'position-longitude': '',
-    ...         'position-text': 'ocean south of ghana',
     ...         'location': 'very mysterious',
     ...         'static_img_url': ''}
     >>> from opencore.geotagging.testing import MockGeocoder
@@ -123,13 +122,13 @@ def update_info_from_form(orig_info, form, geocoder):
 
     If only text is passed, we use that for geotagging::
 
-    >>> form = {'position-text': 'aha'}
+    >>> form = {'location': 'aha'}
     >>> info, changed = update_info_from_form(orig, form, geocoder)
     Called Products.PleiadesGeocoder.geocode.Geocoder.geocode()
     >>> info == orig
     False
     >>> sorted(changed)
-    ['position-latitude', 'position-longitude', 'position-text', 'static_img_url']
+    ['location', 'position-latitude', 'position-longitude', 'static_img_url']
     >>> print info['position-latitude']
     12.0
     >>> print info['position-longitude']
@@ -162,27 +161,27 @@ def update_info_from_form(orig_info, form, geocoder):
     key. This looks weird but it's convenient for our views::
 
     >>> geocoder = MockGeocoder(returnval=[])
-    >>> form = {'position-text': 'blah'}
+    >>> form = {'location': 'blah'}
     >>> info, changed = update_info_from_form(orig, form, geocoder)
     Called Products.PleiadesGeocoder.geocode.Geocoder.geocode()
     >>> info['errors']
-    {'position-text': u'psm_geocode_failed'}
+    {'location': u'psm_geocode_failed'}
     >>> changed
     ['errors']
 
     If coordinates *and* text are passed, we use the coords::
 
     >>> form = {'position-latitude': 8, 'position-longitude': 9,
-    ...         'position-text': 'stored but not used for geotagging'}
+    ...         'location': 'stored but not used for geotagging'}
     >>> info, changed = update_info_from_form(orig, form, geocoder)
-    >>> info['position-text'] == form['position-text']
+    >>> info['location'] == form['location']
     True
     >>> info['position-latitude'] == form['position-latitude']
     True
     >>> info['position-longitude'] == form['position-longitude']
     True
     >>> sorted(changed)
-    ['position-latitude', 'position-longitude', 'position-text', 'static_img_url']
+    ['location', 'position-latitude', 'position-longitude', 'static_img_url']
 
 
     """
@@ -195,16 +194,11 @@ def update_info_from_form(orig_info, form, geocoder):
     oldlon = orig_info.get('position-longitude', '')
     newlon = form.get('position-longitude', '')
 
-    oldtext = orig_info.get('position-text', '')
-    newtext = form.get('position-text', '')
-
     oldloc = orig_info.get('location', '')
     newloc = form.get('location', '')
 
     if newloc and newloc != oldloc:
         new_info['location'] = newloc
-    if newtext and newtext != oldtext:
-        new_info['position-text'] = newtext
 
     if (newlat != '' and newlon != '') and (float(newlat) != oldlat or
                                             float(newlon) != oldlon):
@@ -219,11 +213,11 @@ def update_info_from_form(orig_info, form, geocoder):
             new_info['position-latitude'] = newlat
             new_info['position-longitude'] = newlon
             new_info['static_img_url'] = location_img_url(newlat, newlon)
-    elif newtext and newtext != oldtext:
-        # If form has an updated position-text and NOT updated coords,
+    elif newloc and newloc != oldloc:
+        # If form has an updated location and NOT updated coords,
         # geocode it and use the resulting coords.
         assert geocoder, 'need a working geocoder implementation; got %s' % geocoder
-        records = geocoder.geocode(newtext)
+        records = geocoder.geocode(newloc)
         if records:
             newlat, newlon = (records[0]['lat'], records[0]['lon'])
             new_info['position-latitude'] = newlat
@@ -231,10 +225,10 @@ def update_info_from_form(orig_info, form, geocoder):
             new_info['static_img_url'] = location_img_url(newlat, newlon)
         else:
             new_info['errors'] = {
-                'position-text': _(
+                'location': _(
                 u'psm_geocode_failed',
                 u"Sorry, we were unable to find that address on the map.")}
-            new_info['position-text'] = oldtext
+            new_info['location'] = oldloc
     changed = []
     for key in new_info.keys():
         if new_info[key] != orig_info.get(key):

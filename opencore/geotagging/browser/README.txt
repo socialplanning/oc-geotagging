@@ -141,18 +141,16 @@ The request overrides the values returned by get_geo_info_from_form,
 but not geo_info:
 
     >>> old_info = reader.geo_info.copy()
-    >>> prefs_view.request.form.update({'location': 'nunya bizness',
+    >>> prefs_view.request.form.update({
     ...     'position-latitude': 1.2, 'position-longitude': 3.4,
-    ...     'position-text': 'my house',  'static_img_url': 'IGNORED',
+    ...     'location': 'my house',  'static_img_url': 'IGNORED',
     ...     'maps_script_url': 'IGNORED'})
     >>> info, changed = writer.get_geo_info_from_form()
     >>> info == old_info
     False
-    >>> info['location']
-    'nunya bizness'
     >>> print info['position-latitude'], info['position-longitude']
     1.2 3.4
-    >>> info['position-text']
+    >>> info['location']
     'my house'
 
 
@@ -162,8 +160,7 @@ mock so we don't actually hit google on every test run::
 
     >>> utils.clear_status_messages(prefs_view)
     >>> form.clear()
-    >>> form['position-text'] = "mock address"
-    >>> form['location'] = 'mars'
+    >>> form['location'] = "mock address"
     >>> info, changed = writer.save_coords_from_form(form)
     Called ....geocode('mock address')
     >>> utils.clear_all_memos(prefs_view)  # XXX ugh, wish this wasn't necessary.
@@ -183,8 +180,6 @@ XXX We might want to revisit this, it feels kind of schizo.
 For now, this means that other things in the request aren't saved
 unless we invoke the form handler, not just our wrapper viewlet.
 
-    >>> writer.geo_info['position-text'] == form['position-text']
-    False
     >>> writer.geo_info['location'] == form['location']
     False
 
@@ -196,39 +191,37 @@ human-readable place name::
     >>> prefs_view = proj.restrictedTraverse('preferences')
     >>> utils.clear_status_messages(prefs_view)
     >>> prefs_view.request.form.clear()
-    >>> prefs_view.request.form.update({'location': "oceania", 'update': True,
+    >>> prefs_view.request.form.update({'update': True,
     ...     'project_title': 'IGNORANCE IS STRENGTH',
-    ...     'position-text': 'mock address'})
+    ...     'location': 'mock address'})
 
     >>> prefs_view.handle_request()
     Called ....geocode('mock address')
     >>> utils.get_status_messages(prefs_view)
     [...u'The location has been changed.'...]
-    >>> prefs_view.context.getLocation()
-    'oceania'
     >>> utils.clear_all_memos(prefs_view)
     >>> reader = viewlets.ProjectViewlet(prefs_view.context,
     ...     prefs_view.request, prefs_view, "irrelevant manager")
 
-    >>> reader.geo_info.get('position-text')  # saved now.
+    >>> reader.geo_info.get('location')  # saved now.
     'mock address'
+    >>> prefs_view.context.getLocation()
+    'mock address'
+    
 
 The viewlet includes a bunch of convenient geo-related stuff for UIs::
 
     >>> sorted(reader.geo_info.keys())
-    ['is_geocoded', 'location', 'position-latitude', 'position-longitude', 'position-text', 'static_img_url']
+    ['is_geocoded', 'location', 'position-latitude', 'position-longitude', 'static_img_url']
     >>> reader.geo_info['is_geocoded']
     True
-
-    >>> reader.geo_info['location']
-    'oceania'
 
     >>> round(reader.geo_info['position-latitude'])
     12.0
     >>> round(reader.geo_info['position-longitude'])
     -87.0
 
-    >>> reader.geo_info['position-text']
+    >>> reader.geo_info['location']
     'mock address'
     >>> reader.geo_info['static_img_url']
     'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=500&h=300&zm=9600&cc='
@@ -414,7 +407,6 @@ We can wrap a profile edit view in a geo-specific viewlet::
      'location': '',
      'position-latitude': '',
      'position-longitude': '',
-     'position-text': '',
      'static_img_url': ''}
     
 We have an edit viewlet that can be used to handle forms and
@@ -474,28 +466,25 @@ static image url now::
      'location': 'somewhere',
      'position-latitude': 45.0,
      'position-longitude': 0.0,
-     'position-text': '',
      'static_img_url': 'http://...'}
 
-Submitting the form with position-text should cause the (mock)
+Submitting the form with location should cause the (mock)
 geocoder to be used::
 
     >>> prof_view = m1.restrictedTraverse('@@profile-edit')
     >>> prof_view.request.form.clear()
     >>> reader = viewlets.MemberProfileViewlet(prof_view.context,
     ...     prof_view.request, prof_view, 'irrelevant')
-    >>> prof_view.request.form.update({'position-text': 'atlantis',
-    ...     'location': 'somewhere underwater', })
+    >>> prof_view.request.form.update({'location': 'atlantis'})
     >>> redirected = prof_view.handle_form()
     Called ...geocode('atlantis')
 
     >>> utils.clear_all_memos(prof_view)  # XXX Ugh, make this unnecessary.
     >>> pprint(reader.geo_info)
     {'is_geocoded': True,
-     'location': 'somewhere underwater',
+     'location': 'atlantis',
      'position-latitude': 12.0,
      'position-longitude': -87.0,
-     'position-text': 'atlantis',
      'static_img_url': 'http://...'}
 
 
@@ -526,7 +515,6 @@ Request values affect get_geo_info_from_form but not geo_info:
      'location': 'somewhere',
      'position-latitude': 45.0,
      'position-longitude': 0.0,
-     'position-text': 'atlantis',
      'static_img_url': 'http://maps...'}
 
 

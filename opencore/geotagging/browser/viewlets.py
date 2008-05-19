@@ -42,7 +42,6 @@ class ReadGeoViewletBase(ViewletBase):
                 }
         content = self._get_viewedcontent()
         info['location'] = content and content.getLocation() or ''
-        info['position-text'] = content and content.getPositionText() or ''
         coords = self.get_geolocation()
         try:
             lon, lat = coords[:2]
@@ -95,17 +94,12 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         elif changes:
             # XXX and yet another google hit...
             self.save_coords_from_form()
-            if 'position-text' in changes:
-                # This should be implicitly handled by our archetypes schema,
-                # but for some reason it's not; so, be explicit.
-                pos = geo_info['position-text']
-                self._get_viewedcontent().setPositionText(pos)
             view.add_status_message(_(u'psm_location_changed'))
             
         # Clean up a bit to avoid archetypes trying to handle our form
         # info.
         form = self.request.form
-        for key in ('position-latitude', 'position-longitude', 'position-text'):
+        for key in ('position-latitude', 'position-longitude'):
             if form.has_key(key):
                 del form[key]
         
