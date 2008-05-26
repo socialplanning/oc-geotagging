@@ -4,4 +4,8 @@
 <input type="text" id="location" name="location" class="oc-autoFocus"
     tal:attributes="value request/location | view/geo_info/location;
                     class python:request.form.get('field') == 'location' and default or nothing" />
+<input type="hidden" id="position-latitude" name="position-latitude"
+    tal:attributes="value view/geo_info/position-latitude | nothing" />
+<input type="hidden" id="position-longitude" name="position-longitude"
+    tal:attributes="value view/geo_info/position-longitude | nothing" />
 
