@@ -200,6 +200,11 @@ class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
     render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
 
 
+class MemberProfileSidebarViewlet(MemberProfileViewlet):
+
+    render = ZopeTwoPageTemplateFile('profile_edit_sidebar.pt')
+
+
 
 class GeoJSViewlet:
 
