@@ -82,6 +82,9 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     new_info = None
 
+    @property
+    def errors(self):
+        return getattr(self.__parent__, 'errors', {})
 
     def save(self):
         """Save form data, if changed."""
@@ -90,6 +93,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         geo_info, changes = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         if errors:
+            # This shouldn't happen, we should already have called validate()
             view.errors.update(errors)
         elif changes:
             # XXX and yet another google hit...

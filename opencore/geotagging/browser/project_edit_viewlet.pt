@@ -12,11 +12,12 @@
                   </th>
                   <td id="position-input" class="oc-form-value oc-form-fieldBlock">
                     <input type="text" id="location" name="location"
-                           tal:attributes="value view/geo_info/location | nothing" />  (XXX do we want to say something about what we'll use this for? eg. for privacy concerns?)
+                           tal:attributes="value request/location | view/geo_info/location | nothing" />  (XXX do we want to say something about what we'll use this for? eg. for privacy concerns?)
                     <span class="oc-js-unhide">
                        <input type="button" value="Update Map" id="oc-map-update-button" />
                        <br/>
-                       <span class="oc-form-error" id="oc-map-errors"></span>
+                       <span class="oc-form-error" id="oc-map-errors"
+                           tal:content="view/errors/location | nothing"></span>
 		    </span>
 
                     <div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
