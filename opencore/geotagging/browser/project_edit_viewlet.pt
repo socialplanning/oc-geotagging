@@ -4,7 +4,7 @@
                        tal:attributes="value view/geo_info/position-latitude | nothing" />
                 <input type="hidden" id="position-longitude" name="position-longitude"
                        tal:attributes="value view/geo_info/position-longitude | nothing" />
-                <tr id="oc-template-location.jsonXXX" class="oc-form-row">
+                <tr class="oc-form-row">
 
                   <th id="position-header" class="oc-form-label" scope="row">
                     <label for="location" i18n:translate="project-edit_address_label">
@@ -13,6 +13,12 @@
                   <td id="position-input" class="oc-form-value oc-form-fieldBlock">
                     <input type="text" id="location" name="location"
                            tal:attributes="value view/geo_info/location | nothing" />  (XXX do we want to say something about what we'll use this for? eg. for privacy concerns?)
+                    <span class="oc-js-unhide">
+                       <input type="button" value="Update Map" id="oc-map-update-button" />
+                       <br/>
+                       <span class="oc-form-error" id="oc-map-errors"></span>
+		    </span>
+
                     <div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
 		      <noscript tal:condition="view/geo_info/static_img_url | nothing">
 			<img tal:attributes="src view/geo_info/static_img_url" />

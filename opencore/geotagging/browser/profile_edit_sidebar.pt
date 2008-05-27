@@ -1,5 +1,5 @@
 <!-- Map for profile edit sidebar -->
-<div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
+<div id="position" class="oc-js-gmap oc-sidebar-map"><!-- the js-enabled map goes here -->
     <noscript tal:condition="view/geo_info/static_img_url | nothing">
         <img tal:attributes="src view/geo_info/static_img_url" />
     </noscript>

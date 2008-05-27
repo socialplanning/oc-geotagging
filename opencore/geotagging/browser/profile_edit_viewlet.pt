@@ -1,9 +1,14 @@
 <label i18n:translate="profile-edit_location_label" for="location">Location</label> (example: "New York, NY" or "cloud nine")
 <br />
-<!-- needs to be modified to match the new spec w/ a map and everything... -->
 <input type="text" id="location" name="location" class="oc-autoFocus"
     tal:attributes="value request/location | view/geo_info/location;
                     class python:request.form.get('field') == 'location' and default or nothing" />
+<span class="oc-js-unhide">
+  <input type="button" value="Update Map" id="oc-map-update-button"/>
+  <br />
+  <span class="oc-form-error" id="oc-map-errors"></span>
+</span>
+
 <input type="hidden" id="position-latitude" name="position-latitude"
     tal:attributes="value view/geo_info/position-latitude | nothing" />
 <input type="hidden" id="position-longitude" name="position-longitude"
