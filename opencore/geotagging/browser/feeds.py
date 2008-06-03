@@ -1,9 +1,7 @@
-from Globals import DevelopmentMode
 from Products.PleiadesGeocoder.browser.info import GeoInfosetView
 import cStringIO
 import logging
 import traceback
-import os.path
 
 logger = logging.getLogger('opencore.geotagging.feeds')
 
