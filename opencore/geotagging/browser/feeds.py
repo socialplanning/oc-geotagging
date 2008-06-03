@@ -1,8 +1,11 @@
+from Globals import DevelopmentMode
+from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.PleiadesGeocoder.browser.info import GeoInfosetView
-
+from opencore.browser import tal
 import cStringIO
-import traceback
 import logging
+import traceback
+import os.path
 
 logger = logging.getLogger('opencore.geotagging.feeds')
 
@@ -61,8 +64,51 @@ _rss_polygon = '''<entry>
 _rss_tail = '\n</feed>\n'
 
 
+class XmlPageTemplateFile(ZopeTwoPageTemplateFile):
+
+    """This class exists because the process whereby PageTemplateFile
+    decides whether to use HTML or XML mode for parsing and validation
+    is completely stupid.
+    """
+    
+    content_type = 'text/xml'
+
+    def _cook_check(self):
+        # In PageTemplateFile, this gets called potentially multiple
+        # times (if you're in dev mode), sniffs the file's content,
+        # and if it doesn't start with an XML declaration, uses HTML
+        # mode.  We don't want that.  So here, we duplicate the same
+        # code without the sniffing.
+        if self._v_last_read and not DevelopmentMode:
+            return
+        __traceback_info__ = self.filename
+        try:
+            mtime = os.path.getmtime(self.filename)
+        except OSError:
+            mtime = 0
+        if self._v_program is not None and mtime == self._v_last_read:
+            return
+        t = self.content_type  # Take my word for it, dammit!
+        f = open(self.filename, "rb")
+        if t != "text/xml":
+            # For HTML, we really want the file read in text mode:
+            f.close()
+            f = open(self.filename, 'U')
+            text = ''
+        text = f.read()
+        f.close()
+        self.pt_edit(text, t)
+        self._cook()
+        if self._v_errors:
+            logger.error('Error in template: %s' % '\n'.join(self._v_errors))
+            return
+        self._v_last_read = mtime
+
+
 class GeoRssView(GeoInfosetView):
 
+    template = ZopeTwoPageTemplateFile('georss_point.zpt')
+    
     def georss(self):
         """Stream a GeoRSS xml feed for this container.
         """
@@ -87,13 +133,18 @@ class GeoRssView(GeoInfosetView):
                 properties['description'] = properties.get('description') or 'None.'
                 properties['coords_georss'] = item['coords_georss']
                 if item['hasPoint']:
-                    response.write(_rss_point % properties)
+                    macro = self.template.macros['point_macro']
+                    macro_context = tal.create_tal_context(self, options=properties)
+                    snippet = tal.render(macro, macro_context,
+                                         macros=self.template.macros)
+                    response.write(snippet.encode('utf8'))
+##                    response.write(_rss_point % properties)
                 elif item['hasLineString']:
                     response.write(_rss_linestring % properties)
                 elif item['hasPolygon']:
                     response.write(_rss_polygon % properties)
                 else:
-                    pass
+                    continue
         except:
             # Yuck. ZServer can't tolerate exceptions once you've
             # started streaming with response.write().

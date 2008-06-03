@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dummy xmlns:tal="http://xml.zope.org/namespaces/tal"
+       xmlns:metal="http://xml.zope.org/namespaces/metal"
+       xmlns:georss="osufasd"
+       xmlns:gml="argh">
+
+<metal:macro define-macro="point_macro">
+<entry>
+<title tal:content="options/title"></title>
+<link rel="alternate" tal:attributes="href options/link" tal:content="options/link"></link>
+<id tal:content="options/link"></id>
+<updated tal:content="options/updated"></updated>
+<summary tal:content="options/description"></summary>
+<georss:where><gml:Point>
+<gml:pos tal:content="options/coords_georss"></gml:pos>
+</gml:Point></georss:where>
+</entry>
+</metal:macro>
+
+</dummy>

@@ -5,7 +5,7 @@ It's really slow for large amounts of data...
 
 fetching http://localhost:8080/openplans/projects/georss
 
-projects created via my "lotsaprojects" script
+projects created via my "populate_opencore_projects.py" script
 
 All "ab" tests were run with zope "warm", i.e. at least one hit to the feed
 was made before calling ab. So these are best-case tests under load.
@@ -132,6 +132,8 @@ committed r12736
 
 also no leading whitespace.
 
+Payload XML size: 647,206
+
 This may also be more responsive if the client uses a streaming xml
 parser like expat (firefox does).  When zope is cold, you still have
 to wait ~ 20 seconds to get the first entry.
@@ -141,15 +143,36 @@ to wait ~ 20 seconds to get the first entry.
 
  ab -c 20 -n 40:
 
-  Requests per second:    0.34 [#/sec] (mean)
-  Time per request:       59164.055 [ms] (mean)
-  Time per request:       2958.203 [ms] (mean, across all concurrent requests)
-  Transfer rate:          213.26 [Kbytes/sec] received
+  Requests per second:    0.40 [#/sec] (mean)
+  Time per request:       50231.121 [ms] (mean)
+  Time per request:       2512.61 [ms] (mean, across all concurrent requests)
+  Transfer rate:          251.26 [Kbytes/sec] received
 
 
 Slightly more than marginal improvement, maybe 25% r.p.s.
 
 Clearly the bottleneck is loading and iterating over all the objects.
+
+
+
+Use a python view that calls response.write() using a ZPT macro
+---------------------------------------------------------------
+
+also no leading whitespace.
+Definitely more overhead than the python response.write version.
+And the code is more complex. Not worth it.
+
+ Payload xml size: 654199 bytes
+
+ wget, zope COLD: ~ 46.5 sec
+ wget, zope WARM: ~ 3.5 sec
+
+ ab -c 20 -n 40:
+
+   Requests per second:    0.27 [#/sec] (mean)
+   Time per request:       73031.398 [ms] (mean)
+   Time per request:       3651.570 [ms] (mean, across all concurrent requests)
+   Transfer rate:          175.01 [Kbytes/sec] received
 
 
 Quick cache hack
