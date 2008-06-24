@@ -36,6 +36,14 @@
      />
 
   <browser:viewlet
+     name="static_location"
+     for="*"
+     manager="opencore.project.browser.interfaces.IProjectSidebar"
+     class=".viewlets.ProjectViewlet"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
      name="member_profileform"
      for="*"
      manager="opencore.member.browser.interfaces.IMemberProfilePrefs"
@@ -51,6 +59,13 @@
      permission="zope2.View"
      />
 
+  <browser:viewlet
+     name="member_profile_viewlet"
+     for="*"
+     manager="opencore.member.browser.interfaces.IMemberProfileSidebar"
+     class=".viewlets.MemberProfileViewlet"
+     permission="zope2.View"
+     />
 
   <browser:viewlet
      name="geo_script_tag"

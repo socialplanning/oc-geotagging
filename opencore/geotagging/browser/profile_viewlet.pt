@@ -1,1 +1,1 @@
-TO DO
+<img tal:attributes="src view/geo_info/static_img_url" />

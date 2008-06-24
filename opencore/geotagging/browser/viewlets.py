@@ -161,6 +161,15 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
 class ProjectViewlet(ReadGeoViewletBase):
 
+    render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
+
+    @property
+    def geo_info(self):
+        info = super(ProjectViewlet, self).geo_info
+        # Override the static map image size. Ugh, sucks to have this in code.
+        info['static_img_url'] = self.location_img_url(width=285, height=285)
+        return info
+
     def _get_viewedcontent(self):
         # Find the project in the acquisition context.
         # I tried to call self.view.piv.project and .inproject, et al. but
@@ -185,7 +194,7 @@ class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 class MemberProfileViewlet(ReadGeoViewletBase):
 
     render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
-
+        
     @property
     def geo_info(self):
         info = super(MemberProfileViewlet, self).geo_info
