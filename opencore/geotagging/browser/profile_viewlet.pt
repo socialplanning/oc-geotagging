@@ -1,1 +1,10 @@
-<img tal:attributes="src view/geo_info/static_img_url" />
+<input type="hidden" id="position-latitude" name="position-latitude"
+    tal:attributes="value view/geo_info/position-latitude | nothing" />
+<input type="hidden" id="position-longitude" name="position-longitude"
+    tal:attributes="value view/geo_info/position-longitude | nothing" />
+
+<div id="position" class="oc-js-gmap oc-sidebar-map">
+ <noscript>
+  <img tal:attributes="src view/geo_info/static_img_url" />
+ </noscript>
+</div>
