@@ -161,7 +161,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
 class ProjectViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
+    render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
 
     @property
     def geo_info(self):
@@ -193,7 +193,7 @@ class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
 class MemberProfileViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('profile_viewlet.pt')
+    render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
         
     @property
     def geo_info(self):
