@@ -7,11 +7,11 @@
                 <tr class="oc-form-row">
 
                   <th id="position-header" class="oc-form-label" scope="row">
-                    <label for="location" i18n:translate="project-edit_address_label">
+                    <label for="geolocation" i18n:translate="project-edit_address_label">
                      Location:</label>
                   </th>
                   <td id="position-input" class="oc-form-value oc-form-fieldBlock">
-                    <input type="text" id="location" name="location"
+                    <input type="text" id="geolocation" name="geolocation"
                            tal:attributes="value request/location | view/geo_info/location | nothing" />  (XXX do we want to say something about what we'll use this for? eg. for privacy concerns?)
                     <span class="oc-js-unhide">
                        <input type="button" value="Update Map" id="oc-map-update-button" />

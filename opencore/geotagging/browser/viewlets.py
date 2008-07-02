@@ -41,7 +41,7 @@ class ReadGeoViewletBase(ViewletBase):
                 'is_geocoded': self.is_geocoded(),
                 }
         content = self._get_viewedcontent()
-        info['location'] = content and content.getLocation() or ''
+        info['location'] = ''
         coords = self.get_geolocation()
         try:
             lon, lat = coords[:2]
@@ -88,6 +88,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     def save(self):
         """Save form data, if changed."""
+
         view = self.__parent__
         # XXX we've already geocoded in validate(), don't hit google twice!
         geo_info, changes = self.get_geo_info_from_form()
@@ -115,6 +116,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         This is kind of gunky, but was the most expedient way to
         integrate with our existing forms.
         """
+
         view = self.__parent__
         geo_info, changed = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
@@ -137,7 +139,8 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         """See IWriteGeo.
         """
         if form is None:
-            form = self.request.form
+            form = dict(self.request.form)
+            form['location'] = form.get('geolocation')
         if old_info is None:
             old_info = self.geo_info
         new_info, changed = utils.update_info_from_form(
