@@ -60,14 +60,6 @@
      />
 
   <browser:viewlet
-     name="member_profile_viewlet"
-     for="*"
-     manager="opencore.member.browser.interfaces.IMemberProfileSidebar"
-     class=".viewlets.MemberProfileViewlet"
-     permission="zope2.View"
-     />
-
-  <browser:viewlet
      name="geo_script_tag"
      for="*"
      manager="opencore.browser.interfaces.IJSViewlets"
