@@ -1,4 +1,4 @@
-<label i18n:translate="profile-edit_location_label" for="location">Location</label> (example: "New York, NY" or "cloud nine")
+<label i18n:translate="profile-edit_location_label" for="geolocation">Location on map</label>
 <br />
 
 <input type="text" id="geolocation" name="geolocation" class="oc-autoFocus"
