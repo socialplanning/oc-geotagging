@@ -59,9 +59,30 @@
      permission="zope2.View"
      />
 
+  <!-- note: ProfileView covers member profile *and*
+       profile/edit which subclasses the ProfileView class -->
   <browser:viewlet
      name="geo_script_tag"
      for="*"
+     view="opencore.member.browser.view.ProfileView"
+     manager="opencore.browser.interfaces.IJSViewlets"
+     class=".viewlets.GeoJSViewlet"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="geo_script_tag"
+     for="*"
+     view="opencore.project.browser.preferences.ProjectPreferencesView"
+     manager="opencore.browser.interfaces.IJSViewlets"
+     class=".viewlets.GeoJSViewlet"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="geo_script_tag"
+     for="*"
+     view="opencore.project.browser.latest_activity.LatestActivityView"
      manager="opencore.browser.interfaces.IJSViewlets"
      class=".viewlets.GeoJSViewlet"
      permission="zope2.View"
