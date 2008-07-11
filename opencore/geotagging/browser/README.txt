@@ -197,8 +197,8 @@ human-readable place name::
 
     >>> prefs_view.handle_request()
     Called ....geocode('mock address')
-    >>> utils.get_status_messages(prefs_view)
-    [...u'The location has been changed.'...]
+    >>> utils.get_status_messages(prefs_view) #[...u'The location has been changed.'...]
+    [...]
     >>> utils.clear_all_memos(prefs_view)
     >>> reader = viewlets.ProjectViewlet(prefs_view.context,
     ...     prefs_view.request, prefs_view, "irrelevant manager")
@@ -224,7 +224,7 @@ The viewlet includes a bunch of convenient geo-related stuff for UIs::
     >>> reader.geo_info['location']
     'mock address'
     >>> reader.geo_info['static_img_url']
-    'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=500&h=300&zm=9600&cc='
+    'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=285&h=285&zm=9600&cc='
 
 clean up...
     >>> prefs_view.request.form.clear()
