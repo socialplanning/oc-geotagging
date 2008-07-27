@@ -33,6 +33,7 @@
      manager="opencore.project.browser.interfaces.IProjectPrefs"
      class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
+     template="project_edit_viewlet.pt"
      />
 
   <browser:viewlet

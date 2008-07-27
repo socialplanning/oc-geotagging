@@ -190,9 +190,6 @@ class ProjectViewlet(ReadGeoViewletBase):
 class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
     title = 'Location'
-    
-    render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
-
 
 class MemberProfileViewlet(ReadGeoViewletBase):
 
