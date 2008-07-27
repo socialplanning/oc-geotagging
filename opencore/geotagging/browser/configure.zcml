@@ -37,8 +37,8 @@
 
   <browser:viewlet
      name="static_location"
-     for="*"
-     manager="opencore.project.browser.interfaces.IProjectSidebar"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.ISidebar"
      class=".viewlets.ProjectViewlet"
      permission="zope2.View"
      />
@@ -53,8 +53,8 @@
 
   <browser:viewlet
      name="member_profile_sidebar"
-     for="*"
-     manager="opencore.member.browser.interfaces.IMemberProfileSidebar"
+     for="opencore.member.interfaces.IOpenMember"
+     manager="opencore.browser.interfaces.ISidebar"
      class=".viewlets.MemberProfileSidebarViewlet"
      permission="zope2.View"
      />
