@@ -210,10 +210,6 @@ class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
     pass
 
 
-class MemberProfileSidebarViewlet(MemberProfileViewlet):
-    pass
-
-
 class GeoJSViewlet:
 
     """provides a <script> tag for pages that need geo-related js
