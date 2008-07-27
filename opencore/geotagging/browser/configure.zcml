@@ -28,9 +28,86 @@
   <!-- Viewlets to plug into various forms in the opencore UI -->
 
   <browser:viewlet
+     name="map"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.ProjectViewlet"
+     template="map.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="map"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.ISidebar"
+     class=".viewlets.ProjectViewlet"
+     template="map.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="map"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.ISidebar"
+     class=".viewlets.MemberProfileViewlet"
+     template="map.pt"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="geocoding"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.ProjectViewlet"
+     template="geocoding.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="geocoding"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.MemberProfileViewlet"
+     template="geocoding.pt"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="latlong"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.ProjectViewlet"
+     template="latlong.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="latlong"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.ISidebar"
+     class=".viewlets.ProjectViewlet"
+     template="latlong.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="latlong"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.ISidebar"
+     class=".viewlets.MemberProfileViewlet"
+     template="latlong.pt"
+     permission="zope2.View"
+     />
+  <browser:viewlet
+     name="latlong"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.MemberProfileViewlet"
+     template="latlong.pt"
+     permission="zope2.View"
+     />
+
+
+<!--
+  <browser:viewlet
      name="project_locationform"
      for="opencore.interfaces.IProject"
-     manager="opencore.project.browser.interfaces.IProjectPrefs"
+     manager="opencore.browser.interfaces.IEditForm"
      class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
      template="project_edit_viewlet.pt"
@@ -38,12 +115,13 @@
   <browser:viewlet
      name="project_locationform"
      for="opencore.interfaces.IAddProject"
-     manager="opencore.project.browser.interfaces.IProjectPrefs"
+     manager="opencore.browser.interfaces.IEditForm"
      class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
      template="project_edit_viewlet.pt"
      />
-
+-->
+<!--
   <browser:viewlet
      name="static_location"
      for="opencore.interfaces.IProject"
@@ -52,16 +130,18 @@
      template="static_map_viewlet.pt"
      permission="zope2.View"
      />
-
+-->
+<!--
   <browser:viewlet
      name="member_profileform"
      for="opencore.interfaces.member.IMemberFolder"
-     manager="opencore.project.browser.interfaces.IProjectPrefs"
+     manager="opencore.browser.interfaces.IEditForm"
      class=".viewlets.MemberProfileEditViewlet"
      template="profile_edit_viewlet.pt"
      permission="zope2.View"
      />
-
+-->
+<!--
   <browser:viewlet
      name="member_profile_sidebar"
      for="opencore.interfaces.member.IMemberFolder"
@@ -70,6 +150,7 @@
      template="profile_edit_sidebar.pt"
      permission="zope2.View"
      />
+-->
 
   <!-- note: ProfileView covers member profile *and*
        profile/edit which subclasses the ProfileView class -->
