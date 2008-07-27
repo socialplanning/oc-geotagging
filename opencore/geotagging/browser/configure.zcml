@@ -29,7 +29,15 @@
 
   <browser:viewlet
      name="project_locationform"
-     for="*"
+     for="opencore.interfaces.IProject"
+     manager="opencore.project.browser.interfaces.IProjectPrefs"
+     class=".viewlets.ProjectEditViewlet"
+     permission="zope2.View"
+     template="project_edit_viewlet.pt"
+     />
+  <browser:viewlet
+     name="project_locationform"
+     for="opencore.interfaces.IAddProject"
      manager="opencore.project.browser.interfaces.IProjectPrefs"
      class=".viewlets.ProjectEditViewlet"
      permission="zope2.View"
@@ -41,22 +49,25 @@
      for="opencore.interfaces.IProject"
      manager="opencore.browser.interfaces.ISidebar"
      class=".viewlets.ProjectViewlet"
+     template="static_map_viewlet.pt"
      permission="zope2.View"
      />
 
   <browser:viewlet
      name="member_profileform"
-     for="*"
-     manager="opencore.member.browser.interfaces.IMemberProfilePrefs"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.project.browser.interfaces.IProjectPrefs"
      class=".viewlets.MemberProfileEditViewlet"
+     template="profile_edit_viewlet.pt"
      permission="zope2.View"
      />
 
   <browser:viewlet
      name="member_profile_sidebar"
-     for="opencore.member.interfaces.IOpenMember"
+     for="opencore.interfaces.member.IMemberFolder"
      manager="opencore.browser.interfaces.ISidebar"
      class=".viewlets.MemberProfileSidebarViewlet"
+     template="profile_edit_sidebar.pt"
      permission="zope2.View"
      />
 
