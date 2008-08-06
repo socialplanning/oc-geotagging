@@ -60,7 +60,7 @@
      name="geocoding"
      for="opencore.interfaces.IProject"
      manager="opencore.browser.interfaces.IEditForm"
-     class=".viewlets.ProjectViewlet"
+     class=".viewlets.ProjectEditViewlet"
      template="geocoding.pt"
      permission="zope2.View"
      />
@@ -68,7 +68,7 @@
      name="geocoding"
      for="opencore.interfaces.member.IMemberFolder"
      manager="opencore.browser.interfaces.IEditForm"
-     class=".viewlets.MemberProfileViewlet"
+     class=".viewlets.MemberProfileEditViewlet"
      template="geocoding.pt"
      permission="zope2.View"
      />
