@@ -21,13 +21,8 @@ class ReadGeoViewletBase(ViewletBase):
 
     implements(interfaces.IReadGeo)
 
-    def update(self):
-        """we're not using update; does that mean viewlets are a poor choice?
-        """
-        pass
-
-    def render(self):
-        raise NotImplementedError
+    def render(self, *args, **kw):
+        return self(*args, **kw)
 
     def is_geocoded(self):
         """See IReadGeo."""
@@ -191,8 +186,6 @@ class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
 class MemberProfileViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
-        
     @property
     def geo_info(self):
         info = super(MemberProfileViewlet, self).geo_info
