@@ -27,7 +27,7 @@
 
   <!-- Viewlets to plug into various forms in the opencore UI -->
 
-  <!-- display a map on project edit and project summary -->
+  <!-- display a map, geocoder and latlong on project edit -->
   <browser:viewlet
      name="map"
      for="opencore.interfaces.IProject"
@@ -37,25 +37,6 @@
      template="map.pt"
      permission="zope2.View"
      />
-  <browser:viewlet
-     name="map"
-     for="opencore.interfaces.IProject"
-     manager="opencore.browser.interfaces.ISidebar"
-     view="opencore.project.browser.latest_activity.LatestActivityView"
-     class=".viewlets.ProjectViewlet"
-     template="map.pt"
-     permission="zope2.View"
-     />
-  <!-- display a map on both project and project-edit -->
-  <browser:viewlet
-     name="map"
-     for="opencore.interfaces.member.IMemberFolder"
-     manager="opencore.browser.interfaces.ISidebar"
-     class=".viewlets.MemberProfileViewlet"
-     template="map.pt"
-     permission="zope2.View"
-     />
-
   <browser:viewlet
      name="geocoding"
      for="opencore.interfaces.IProject"
@@ -65,21 +46,24 @@
      permission="zope2.View"
      />
   <browser:viewlet
-     name="geocoding"
-     for="opencore.interfaces.member.IMemberFolder"
-     manager="opencore.browser.interfaces.IEditForm"
-     class=".viewlets.MemberProfileEditViewlet"
-     template="geocoding.pt"
-     permission="zope2.View"
-     />
-
-  <browser:viewlet
      name="latlong"
      for="opencore.interfaces.IProject"
      manager="opencore.browser.interfaces.IEditForm"
      view="opencore.project.browser.preferences.ProjectPreferencesView"
      class=".viewlets.ProjectViewlet"
      template="latlong.pt"
+     permission="zope2.View"
+     />
+
+
+  <!-- display a map and latlong on project summary -->
+  <browser:viewlet
+     name="map"
+     for="opencore.interfaces.IProject"
+     manager="opencore.browser.interfaces.ISidebar"
+     view="opencore.project.browser.latest_activity.LatestActivityView"
+     class=".viewlets.ProjectViewlet"
+     template="map.pt"
      permission="zope2.View"
      />
   <browser:viewlet
@@ -91,12 +75,33 @@
      template="latlong.pt"
      permission="zope2.View"
      />
+
+
+  <!-- display a map and latlong on both profile and profile-edit -->
+  <browser:viewlet
+     name="map"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.ISidebar"
+     class=".viewlets.MemberProfileViewlet"
+     template="map.pt"
+     permission="zope2.View"
+     />
   <browser:viewlet
      name="latlong"
      for="opencore.interfaces.member.IMemberFolder"
      manager="opencore.browser.interfaces.ISidebar"
      class=".viewlets.MemberProfileViewlet"
      template="latlong.pt"
+     permission="zope2.View"
+     />
+
+  <!-- also display a geocoder on profile-edit, but elsewhere -->
+  <browser:viewlet
+     name="geocoding"
+     for="opencore.interfaces.member.IMemberFolder"
+     manager="opencore.browser.interfaces.IEditForm"
+     class=".viewlets.MemberProfileEditViewlet"
+     template="geocoding.pt"
      permission="zope2.View"
      />
 
