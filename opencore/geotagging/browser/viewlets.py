@@ -2,7 +2,6 @@ import warnings
 from Products.CMFCore.utils import getToolByName
 from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
-from Products.Five.viewlet.viewlet import ViewletBase
 from opencore.browser.base import _
 from opencore.geotagging import interfaces
 from opencore.geotagging import utils
@@ -12,7 +11,7 @@ from urlparse import urlparse
 from zope.component import getUtility
 from zope.interface import implements
 
-class ReadGeoViewletBase(ViewletBase):
+class ReadGeoViewletBase(object):
 
     """This can be added to a page to show geo info about the context.
     """
@@ -20,9 +19,6 @@ class ReadGeoViewletBase(ViewletBase):
     sort_order = 123  # we'll sort this out later. HA HA I FUNNY
 
     implements(interfaces.IReadGeo)
-
-    def render(self, *args, **kw):
-        return self(*args, **kw)
 
     def is_geocoded(self):
         """See IReadGeo."""
@@ -203,7 +199,7 @@ class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
     pass
 
 
-class GeoJSViewlet:
+class GeoJSViewlet(object):
 
     """provides a <script> tag for pages that need geo-related js
     """
