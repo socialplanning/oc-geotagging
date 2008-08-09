@@ -27,34 +27,15 @@
 
   <!-- Viewlets to plug into various forms in the opencore UI -->
 
-  <!-- display a map, geocoder and latlong on project edit -->
+  <!-- display a map, geocoder and latlong on project edit, but in one viewlet -->
   <browser:viewlet
-     name="map"
      for="opencore.interfaces.IProject"
-     manager="opencore.browser.interfaces.IEditForm"
      view="opencore.project.browser.preferences.ProjectPreferencesView"
-     class=".viewlets.ProjectViewlet"
-     template="map.pt"
-     permission="zope2.View"
-     />
-  <browser:viewlet
-     name="geocoding"
-     for="opencore.interfaces.IProject"
      manager="opencore.browser.interfaces.IEditForm"
+     permission="zope2.View"
+     name="geo.edit.project"
      class=".viewlets.ProjectEditViewlet"
-     template="geocoding.pt"
-     permission="zope2.View"
      />
-  <browser:viewlet
-     name="latlong"
-     for="opencore.interfaces.IProject"
-     manager="opencore.browser.interfaces.IEditForm"
-     view="opencore.project.browser.preferences.ProjectPreferencesView"
-     class=".viewlets.ProjectViewlet"
-     template="latlong.pt"
-     permission="zope2.View"
-     />
-
 
   <!-- display a map and latlong on project summary -->
   <browser:viewlet

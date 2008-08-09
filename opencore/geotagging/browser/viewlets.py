@@ -175,10 +175,16 @@ class ProjectViewlet(ReadGeoViewletBase):
         # exist yet. That's OK, we just won't have as much information.
         return None
 
-
 class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
     title = 'Location'
+
+    map = ZopeTwoPageTemplateFile('map.pt')
+    geocoding = ZopeTwoPageTemplateFile('geocoding.pt')
+    latlong = ZopeTwoPageTemplateFile('latlong.pt')
+    
+    def render(self):
+        return '\n'.join((self.geocoding(), self.latlong(), self.map()))
 
 class MemberProfileViewlet(ReadGeoViewletBase):
 
