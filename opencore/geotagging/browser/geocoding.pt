@@ -1,4 +1,5 @@
-<label i18n:translate="profile-edit_location_label" for="geolocation">Location on map</label>
+<label i18n:translate="profile-edit_location_label" for="geolocation">Find on map</label>
+(your address will not be saved)
 <br />
 
 <input type="text" id="geolocation" name="geolocation" class="oc-autoFocus"
@@ -6,7 +7,7 @@
                     class python:request.form.get('field') == 'location' and default or nothing" />
 <span class="oc-js-unhide">
   <input type="button" value="Update Map" id="oc-map-update-button"
-      style="width: 11em;" />
+         class="oc-button" style="width: 35%" />
   <br />
   <span class="oc-form-error" id="oc-map-errors"
         tal:content="view/errors/location | nothing"></span>
