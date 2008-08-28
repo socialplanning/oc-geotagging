@@ -1,15 +1,18 @@
-import warnings
 from Products.CMFCore.utils import getToolByName
-from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
+from Products.PleiadesGeocoder.geo import ANNO_KEY
+from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from opencore.browser.base import _
+from opencore.browser.octopus import Action
 from opencore.geotagging import interfaces
 from opencore.geotagging import utils
 from opencore.interfaces import IProject
 from opencore.utility.interfaces import IProvideSiteConfig
 from urlparse import urlparse
+from zope.app.annotation.interfaces import IAnnotations
 from zope.component import getUtility
 from zope.interface import implements
+import warnings
 
 class ReadGeoViewletBase(object):
 
@@ -202,7 +205,23 @@ class MemberProfileViewlet(ReadGeoViewletBase):
 
 
 class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
-    pass
+
+    def remove_geo(self, *a, **b):
+        # there's no public API for clearing a geolocation
+        # in oc-geo or PGC, so we go a bit lowlevel here
+        context = self._get_viewedcontent()
+        annot = IAnnotations(context)
+        georef = annot.get(ANNO_KEY, {})
+        georef['geometryType'] = None
+        georef['spatialCoordinates'] = None
+        return self.request.response.redirect(self.context.absolute_url())
+    
+    def update(self):
+        # this is a hack to plug a formhandler into a view
+        # this hack is required by octopus
+        view = self.__parent__
+        geo_remove_action = Action("remove_geo", instance=self)
+        view.actions["remove_geo"] = geo_remove_action
 
 
 class GeoJSViewlet(object):
