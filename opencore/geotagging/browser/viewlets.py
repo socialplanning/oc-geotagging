@@ -214,6 +214,7 @@ class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
         georef = annot.get(ANNO_KEY, {})
         georef['geometryType'] = None
         georef['spatialCoordinates'] = None
+        self.__parent__.add_status_message(u'Map location cleared')
         return self.request.response.redirect(self.context.absolute_url())
     
     def update(self):
