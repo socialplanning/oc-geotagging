@@ -1,37 +1,37 @@
-            <table class="oc-form">
-              <tbody>
-                <input type="hidden" id="position-latitude" name="position-latitude"
-                       tal:attributes="value view/geo_info/position-latitude | nothing" />
-                <input type="hidden" id="position-longitude" name="position-longitude"
-                       tal:attributes="value view/geo_info/position-longitude | nothing" />
-                <tr class="oc-form-row">
+<table class="oc-form">
+  <tbody>
+    <input type="hidden" id="position-latitude" name="position-latitude"
+           tal:attributes="value view/geo_info/position-latitude | nothing" />
+    <input type="hidden" id="position-longitude" name="position-longitude"
+           tal:attributes="value view/geo_info/position-longitude | nothing" />
+    <tr class="oc-form-row">
 
-                  <th id="position-header" class="oc-form-label" scope="row">
-                    <label for="geolocation" i18n:translate="project-edit_address_label">
-                     Location:</label>
-                  </th>
-                  <td id="position-input" class="oc-form-value oc-form-fieldBlock">
-                    <input type="text" id="geolocation" name="geolocation"
-                           tal:attributes="value request/location | view/geo_info/location | nothing" />
-                    <span class="oc-js-unhide">
-                       <input type="button" value="Update Map" id="oc-map-update-button" />
-                       <br/>
-                       <span class="oc-form-error" id="oc-map-errors"
-                           tal:content="view/errors/location | nothing"></span>
-		    </span>
+      <th id="position-header" class="oc-form-label" scope="row">
+        <label for="geolocation" i18n:translate="project-edit_address_label">
+          Location:</label>
+      </th>
+      <td id="position-input" class="oc-form-value oc-form-fieldBlock">
+        <input type="text" id="geolocation" name="geolocation"
+               tal:attributes="value request/location | view/geo_info/location | nothing" />
+        <span class="oc-js-unhide">
+          <input type="button" value="Update Map" id="oc-map-update-button" />
+          <br/>
+          <span class="oc-form-error" id="oc-map-errors"
+                tal:content="view/errors/location | nothing"></span>
+	</span>
 
-                    <div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
-		      <noscript tal:condition="view/geo_info/static_img_url | nothing">
-			<img tal:attributes="src view/geo_info/static_img_url" />
-		      </noscript>
-		    </div>
-                   
-                  </td>
-                  <td class="oc-form-help">
-                    <span class="oc-form-context"></span>
-                    <span id="oc-position-validator" class="oc-form-validator"></span>
-                    <span id="oc-position-error" class="oc-form-error" tal:content="view/errors/location | nothing" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
+	  <noscript tal:condition="view/geo_info/static_img_url | nothing">
+	    <img tal:attributes="src view/geo_info/static_img_url" />
+	  </noscript>
+	</div>
+        
+      </td>
+      <td class="oc-form-help">
+        <span class="oc-form-context"></span>
+        <span id="oc-position-validator" class="oc-form-validator"></span>
+        <span id="oc-position-error" class="oc-form-error" tal:content="view/errors/location | nothing" />
+      </td>
+    </tr>
+  </tbody>
+</table>
