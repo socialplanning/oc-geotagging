@@ -1,6 +1,7 @@
 import warnings
 from Acquisition import aq_inner
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import base_hasattr
 from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.Five.viewlet.viewlet import ViewletBase
@@ -10,6 +11,7 @@ from opencore.geotagging import utils
 from opencore.interfaces import IProject
 from opencore.utility.interfaces import IProvideSiteConfig
 from opencore.utils import interface_in_aq_chain
+from plone.memoize.view import memoize
 from urlparse import urlparse
 from zope.component import getUtility
 from zope.interface import implements
@@ -43,6 +45,7 @@ class ReadGeoViewletBase(ViewletBase):
                 'is_geocoded': self.is_geocoded(),
                 }
         coords = self.get_geolocation()
+        info['location'] = self.get_location()
         try:
             lon, lat = coords[:2]
         except (ValueError, TypeError):
@@ -50,6 +53,21 @@ class ReadGeoViewletBase(ViewletBase):
         info['position-latitude'] = lat
         info['position-longitude'] = lon
         return info
+
+    def get_location(self):
+        # we're abusing the contract a little by calling an AT
+        # accessor on our context object, but we at least check to see
+        # if we can first; this implementation can be moved to a
+        # subclass if we ever need to support other means of fetching
+        # the user-entered location value
+        context = self._get_viewedcontent()
+        location = ''
+        if context is not None:
+            if base_hasattr(context, 'getField'):
+                field = context.getField('location')
+                if field is not None:
+                    location = field.getAccessor(context)()
+        return location
 
     def get_geolocation(self):
         """See IReadGeo. Note the output is ordered as (lon, lat, z)."""
@@ -172,15 +190,11 @@ class ProjectViewlet(ReadGeoViewletBase):
     @property
     def geo_info(self):
         info = super(ProjectViewlet, self).geo_info
-        # we're abusing the contract a little by calling an AT accessor on
-        # our context object, but this is a project viewlet after all...
-        context = self._get_viewedcontent()
-        if context is not None:
-            info['location'] = context.getLocation()
         # Override the static map image size. Ugh, sucks to have this in code.
         info['static_img_url'] = self.location_img_url(width=285, height=285)
         return info
 
+    @memoize
     def _get_viewedcontent(self):
         # Find the project in the acquisition context.
         # I tried to call self.view.piv.project and .inproject, et al. but
@@ -213,6 +227,7 @@ class MemberProfileViewlet(ReadGeoViewletBase):
         return info
 
 
+    @memoize
     def _get_viewedcontent(self):
         # Find the member in the acquisition context.
         return self.__parent__.viewedmember()
@@ -225,7 +240,7 @@ class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
 
 class MemberProfileSidebarViewlet(MemberProfileViewlet):
 
-    render = ZopeTwoPageTemplateFile('profile_edit_sidebar.pt')
+    render = ZopeTwoPageTemplateFile('profile_sidebar.pt')
 
 
 
