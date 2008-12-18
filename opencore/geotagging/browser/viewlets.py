@@ -1,4 +1,5 @@
 import warnings
+from Acquisition import aq_inner
 from Products.CMFCore.utils import getToolByName
 from Products.PleiadesGeocoder.interfaces.simple import IGeoItemSimple
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
@@ -8,6 +9,7 @@ from opencore.geotagging import interfaces
 from opencore.geotagging import utils
 from opencore.interfaces import IProject
 from opencore.utility.interfaces import IProvideSiteConfig
+from opencore.utils import interface_in_aq_chain
 from urlparse import urlparse
 from zope.component import getUtility
 from zope.interface import implements
@@ -40,8 +42,6 @@ class ReadGeoViewletBase(ViewletBase):
         info = {'static_img_url': self.location_img_url(),
                 'is_geocoded': self.is_geocoded(),
                 }
-        content = self._get_viewedcontent()
-        info['location'] = ''
         coords = self.get_geolocation()
         try:
             lon, lat = coords[:2]
@@ -76,7 +76,8 @@ class ReadGeoViewletBase(ViewletBase):
 
 class WriteGeoViewletBase(ReadGeoViewletBase):
 
-    """This can be added to a form to add a widget for setting the context's location.
+    """This can be added to a form to add a widget for setting the
+    context's location.
     """
     implements(interfaces.IReadWriteGeo)
 
@@ -88,7 +89,6 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     def save(self):
         """Save form data, if changed."""
-
         view = self.__parent__
         # XXX we've already geocoded in validate(), don't hit google twice!
         geo_info, changes = self.get_geo_info_from_form()
@@ -107,6 +107,11 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         for key in ('position-latitude', 'position-longitude'):
             if form.has_key(key):
                 del form[key]
+        # wedge 'location' into the request form so the text can be
+        # saved back into the AT field
+        loc_text = form.get('geolocation', '')
+        if loc_text:
+            self.request.form['location'] = loc_text
         
     def validate(self):
         """We're inventing a convention that viewlets used in forms
@@ -160,8 +165,6 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         return new_info, changed
 
 
-
-
 class ProjectViewlet(ReadGeoViewletBase):
 
     render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
@@ -169,6 +172,11 @@ class ProjectViewlet(ReadGeoViewletBase):
     @property
     def geo_info(self):
         info = super(ProjectViewlet, self).geo_info
+        # we're abusing the contract a little by calling an AT accessor on
+        # our context object, but this is a project viewlet after all...
+        context = self._get_viewedcontent()
+        if context is not None:
+            info['location'] = context.getLocation()
         # Override the static map image size. Ugh, sucks to have this in code.
         info['static_img_url'] = self.location_img_url(width=285, height=285)
         return info
@@ -178,13 +186,12 @@ class ProjectViewlet(ReadGeoViewletBase):
         # I tried to call self.view.piv.project and .inproject, et al. but
         # for some reason those return None and False on a closed project.
         # Instead, we walk the acquisition chain by hand.
-        for item in self.context.aq_inner.aq_chain:
-            if IProject.providedBy(item):
-                return item
-        # If we get here, it typically means we're in eg. the projects
-        # folder because our view is an add view and the project doesn't
-        # exist yet. That's OK, we just won't have as much information.
-        return None
+        item = interface_in_aq_chain(aq_inner(self.context), IProject)
+        return item # might be None, which typically means we're in
+                    # eg. the projects folder because our view is an
+                    # add view and the project doesn't exist
+                    # yet. That's OK, we just won't have as much
+                    # information.
 
 
 class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):

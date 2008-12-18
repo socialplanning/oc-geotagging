@@ -11,10 +11,11 @@
           Location:</label>
       </th>
       <td id="position-input" class="oc-form-value oc-form-fieldBlock">
-        <input type="text" id="geolocation" name="geolocation"
+        <input type="text" id="geolocation" name="geolocation" size="40"
                tal:attributes="value request/location | view/geo_info/location | nothing" />
         <span class="oc-js-unhide">
-          <input type="button" value="Update Map" id="oc-map-update-button" />
+          <input type="button" value="Update Map" id="oc-map-update-button"
+                 class="oc-button"/>
           <br/>
           <span class="oc-form-error" id="oc-map-errors"
                 tal:content="view/errors/location | nothing"></span>
