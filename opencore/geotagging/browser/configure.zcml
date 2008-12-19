@@ -82,6 +82,15 @@
   <browser:viewlet
      name="geo_script_tag"
      for="*"
+     view="opencore.project.browser.add.ProjectAddView"
+     manager="opencore.browser.interfaces.IJSViewlets"
+     class=".viewlets.GeoJSViewlet"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="geo_script_tag"
+     for="*"
      view="opencore.project.browser.latest_activity.LatestActivityView"
      manager="opencore.browser.interfaces.IJSViewlets"
      class=".viewlets.GeoJSViewlet"

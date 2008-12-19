@@ -19,8 +19,14 @@ def MemberFolderGeoItem(context):
     if IOpenMember.providedBy(member):
         return IGeoItemSimple(member)
     return None
-    
-class MemberGeoItem(GeoItemSimple):
+
+class ClearableGeoItem(GeoItemSimple):
+    """Adds a clear_geo method which will zero out the geo information"""
+    def clear_geo(self):
+        self.georef['geometryType'] = None
+        self.georef['spatialCoordinates'] = None
+        
+class MemberGeoItem(ClearableGeoItem):
 
     @property
     def __geo_interface__(self):
@@ -48,7 +54,7 @@ class MemberGeoItem(GeoItemSimple):
             'geometry': {'type': self.geom_type, 'coordinates': self.coords}
             }
 
-class ProjectGeoItem(GeoItemSimple):
+class ProjectGeoItem(ClearableGeoItem):
 
     @property
     def __geo_interface__(self):

@@ -108,14 +108,14 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
     def save(self):
         """Save form data, if changed."""
         view = self.__parent__
-        # XXX we've already geocoded in validate(), don't hit google twice!
+        # get_geo_info_from_form is memoized so it shouldn't actually
+        # hit google again
         geo_info, changes = self.get_geo_info_from_form()
         errors = geo_info.get('errors', {})
         if errors:
             # This shouldn't happen, we should already have called validate()
             view.errors.update(errors)
         elif changes:
-            # XXX and yet another google hit...
             self.save_coords_from_form()
             view.add_status_message(_(u'psm_location_changed'))
             
@@ -127,9 +127,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
                 del form[key]
         # wedge 'location' into the request form so the text can be
         # saved back into the AT field
-        loc_text = form.get('geolocation', '')
-        if loc_text:
-            self.request.form['location'] = loc_text
+        self.request.form['location'] = form.get('geolocation', '').strip()
         
     def validate(self):
         """We're inventing a convention that viewlets used in forms
@@ -148,22 +146,29 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     def set_geolocation(self, coords):
         """See IWriteGeo."""
-        if coords and not None in coords:
+        if coords:
             geo = self._get_geo_item()
-            # XXX need to handle things other than a point!
-            if len(coords) == 2:
-                coords = coords + (0.0,)
-            if coords != geo.coords:
-                geo.setGeoInterface('Point', coords)
-                return True
+            if not None in coords:
+                # XXX need to handle things other than a point!
+                if len(coords) == 2:
+                    coords = coords + (0.0,)
+                if coords != geo.coords:
+                    geo.setGeoInterface('Point', coords)
+                    return True
+            else:
+                if geo.isGeoreferenced():
+                    geo.clear_geo()
+                    return True
         return False
 
+    @memoize
     def get_geo_info_from_form(self, form=None, old_info=None):
         """See IWriteGeo.
         """
         if form is None:
             form = dict(self.request.form)
-            form['location'] = form.get('geolocation')
+            loc_text = form.get('geolocation', '').strip()
+            form['location'] = loc_text
         if old_info is None:
             old_info = self.geo_info
         new_info, changed = utils.update_info_from_form(
@@ -174,7 +179,13 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
     def save_coords_from_form(self, form=None):
         """See IWriteGeo."""
-        new_info, changed = self.get_geo_info_from_form(form)
+        if form is None:
+            # we don't just pass in the None b/c we want to match
+            # earlier calls' argument signatures so the memoization
+            # will work and we don't hit google again
+            new_info, changed = self.get_geo_info_from_form()
+        else:
+            new_info, changed = self.get_geo_info_from_form(form)
         lat = new_info.get('position-latitude')
         lon = new_info.get('position-longitude')
         if lat == '': lat = None

@@ -44,8 +44,12 @@ def location_img_url(lat, lon, width=500, height=300):
 
     """
     # Don't know if order matters to Google; assume it does.
-    params = (('latitude_e6', google_e6_encode(lat)),
-              ('longitude_e6', google_e6_encode(lon)),
+    if lat != '':
+        lat = google_e6_encode(lat)
+    if lon != '':
+        lon = google_e6_encode(lon)
+    params = (('latitude_e6', lat),
+              ('longitude_e6', lon),
               ('w', width), ('h', height), # XXX These must match our css.
               ('zm', 9600),  # Initial zoom.
               ('cc', ''), # No idea what this is.
@@ -182,10 +186,7 @@ def update_info_from_form(orig_info, form, geocoder):
     True
     >>> sorted(changed)
     ['location', 'position-latitude', 'position-longitude', 'static_img_url']
-
-
     """
-
     orig_info = orig_info.copy()
     new_info = orig_info.copy()
     oldlat = orig_info.get('position-latitude', '')
@@ -197,12 +198,15 @@ def update_info_from_form(orig_info, form, geocoder):
     oldloc = orig_info.get('location', '')
     newloc = form.get('location', '')
 
-    if newloc and newloc != oldloc:
+    if newloc != oldloc:
         new_info['location'] = newloc
 
-    if (newlat != '' and newlon != '') and (float(newlat) != oldlat or
-                                            float(newlon) != oldlon):
-        # If form has updated coords, always use them.
+    set_new_latlon = False
+    # If form has updated coords, always use them.
+    if newlat == '' and newlon == '':
+        if newlat != oldlat and newlon != oldlon:
+            set_new_latlon = True
+    else:            
         try:
             newlat = float(newlat)
             newlon = float(newlon)
@@ -210,25 +214,34 @@ def update_info_from_form(orig_info, form, geocoder):
             logger.error(
                 "bad values for lat & lon? got %s" % str(newlat, newlon))
         else:
-            new_info['position-latitude'] = newlat
-            new_info['position-longitude'] = newlon
-            new_info['static_img_url'] = location_img_url(newlat, newlon)
-    elif newloc and newloc != oldloc:
+            if newlat != oldlat or newlon != oldlon:
+                set_new_latlon = True
+
+    if not set_new_latlon and newloc != oldloc:
         # If form has an updated location and NOT updated coords,
         # geocode it and use the resulting coords.
         assert geocoder, 'need a working geocoder implementation; got %s' % geocoder
-        records = geocoder.geocode(newloc)
-        if records:
-            newlat, newlon = (records[0]['lat'], records[0]['lon'])
-            new_info['position-latitude'] = newlat
-            new_info['position-longitude'] = newlon
-            new_info['static_img_url'] = location_img_url(newlat, newlon)
+        if not newloc:
+            newlat = ''
+            newlon = ''
+            set_new_latlon = True
         else:
-            new_info['errors'] = {
-                'location': _(
-                u'psm_geocode_failed',
-                u"Sorry, we were unable to find that address on the map.")}
-            new_info['location'] = oldloc
+            records = geocoder.geocode(newloc)
+            if records:
+                newlat, newlon = (records[0]['lat'], records[0]['lon'])
+                set_new_latlon = True
+            else:
+                new_info['errors'] = {
+                    'location': _(
+                    u'psm_geocode_failed',
+                    u"Sorry, we were unable to find that address on the map.")}
+                new_info['location'] = oldloc
+
+    if set_new_latlon:
+        new_info['position-latitude'] = newlat
+        new_info['position-longitude'] = newlon
+        new_info['static_img_url'] = location_img_url(newlat, newlon)
+
     changed = []
     for key in new_info.keys():
         if new_info[key] != orig_info.get(key):
