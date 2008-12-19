@@ -14,13 +14,14 @@
         <input type="text" id="geolocation" name="geolocation" size="40"
                tal:attributes="value request/location | view/geo_info/location | nothing" />
         <span class="oc-js-unhide">
-          <input type="button" value="Update Map" id="oc-map-update-button"
-                 class="oc-button"/>
+          <input type="button" value="Find on map" id="oc-map-update-button"
+                 class="oc-button" style="padding: 0.4em 0.5em;" />
           <br/>
           <span class="oc-form-error" id="oc-map-errors"
                 tal:content="view/errors/location | nothing"></span>
 	</span>
 
+NOTE: this is visible to all, so don't include any private information.
         <div id="position" class="oc-js-gmap oc-map"><!-- the js-enabled map goes here -->
 	  <noscript tal:condition="view/geo_info/static_img_url | nothing">
 	    <img tal:attributes="src view/geo_info/static_img_url" />

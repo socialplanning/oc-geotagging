@@ -1,13 +1,13 @@
 <label i18n:translate="profile-edit_location_label" for="geolocation">
-  Location</label>
- (example: "New York, NY" or "Mission District, San Francisco")
+  Location</label><br />
+ Example: "Brooklyn, NY" or "Mission District, San Francisco"<br />
+ NOTE: this is visible to all, so don't include any private information.
 <br />
-
 <input type="text" id="geolocation" name="geolocation" size="30"
        tal:attributes="value request/location | view/geo_info/location | nothing" />
 <span class="oc-js-unhide">
-  <input type="button" value="Update Map" id="oc-map-update-button"
-         style="width: 11em;" class="oc-button" />
+  <input type="button" value="Find on map" id="oc-map-update-button"
+         style="width: 8.5em; padding: 0.4em 0.5em" class="oc-button" />
   <br />
   <span class="oc-form-error" id="oc-map-errors"></span>
 </span>
