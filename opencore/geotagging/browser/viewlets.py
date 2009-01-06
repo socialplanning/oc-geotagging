@@ -162,13 +162,12 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         return False
 
     @memoize
-    def get_geo_info_from_form(self, form=None, old_info=None):
+    def get_geo_info_from_form(self, old_info=None):
         """See IWriteGeo.
         """
-        if form is None:
-            form = dict(self.request.form)
-            loc_text = form.get('geolocation', '').strip()
-            form['location'] = loc_text
+        form = dict(self.request.form)
+        loc_text = form.get('geolocation', '').strip()
+        form['location'] = loc_text
         if old_info is None:
             old_info = self.geo_info
         new_info, changed = utils.update_info_from_form(
@@ -177,15 +176,9 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         view.errors.update(new_info.get('errors', {}))
         return new_info, changed
 
-    def save_coords_from_form(self, form=None):
+    def save_coords_from_form(self):
         """See IWriteGeo."""
-        if form is None:
-            # we don't just pass in the None b/c we want to match
-            # earlier calls' argument signatures so the memoization
-            # will work and we don't hit google again
-            new_info, changed = self.get_geo_info_from_form()
-        else:
-            new_info, changed = self.get_geo_info_from_form(form)
+        new_info, changed = self.get_geo_info_from_form()
         lat = new_info.get('position-latitude')
         lon = new_info.get('position-longitude')
         if lat == '': lat = None
