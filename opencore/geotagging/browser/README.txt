@@ -73,8 +73,8 @@ If we save an empty form, nothing changes::
     ''
     >>> writer.geo_info.get('position-longitude')
     ''
-    >>> writer.request.form = {}
-    >>> info, changed = writer.save_coords_from_form()
+    >>> form = {}
+    >>> info, changed = writer.save_coords_from_form(form)
     >>> changed
     []
     >>> writer.geo_info.get('position-latitude')
@@ -115,24 +115,21 @@ Our read-only viewlet can see the changes we've made::
 
 You can extract stuff from the form without saving::
 
-    >>> writer.request.form = {'position-latitude': '10.0',
-    ...                        'position-longitude': '-20.0'}
-    >>> info, changed = writer.get_geo_info_from_form()
-    >>> form = writer.request.form
+    >>> form = {'position-latitude': '10.0', 'position-longitude': '-20.0'}
+    >>> info, changed = writer.get_geo_info_from_form(form)
     >>> info['position-latitude'] == float(form['position-latitude'])
     True
     >>> info['position-longitude'] == float(form['position-longitude'])
     True
 
-Empty form clears the values, sets the static_img_url to the default
-location::
+No change with an empty form::
 
     >>> prefs_view.request.form.clear()
     >>> info, changed = writer.get_geo_info_from_form()
     >>> info == writer.geo_info
-    False
-    >>> sorted(changed)
-    ['position-latitude', 'position-longitude', 'static_img_url']
+    True
+    >>> changed
+    []
 
 get_geo_info_from_form has no side effects:
 
@@ -143,11 +140,10 @@ get_geo_info_from_form has no side effects:
 The request overrides the values returned by get_geo_info_from_form,
 but not geo_info:
 
-    >>> utils.clear_all_memos(prefs_view)
     >>> old_info = reader.geo_info.copy()
     >>> prefs_view.request.form.update({
     ...     'position-latitude': 1.2, 'position-longitude': 3.4,
-    ...     'geolocation': 'my house',  'static_img_url': 'IGNORED',
+    ...     'location': 'my house',  'static_img_url': 'IGNORED',
     ...     'maps_script_url': 'IGNORED'})
     >>> info, changed = writer.get_geo_info_from_form()
     >>> info == old_info
@@ -158,19 +154,16 @@ but not geo_info:
     'my house'
 
 
-You can also pass in a string; if the coordinates have changed,
-though, they take precedence over the string value, so we have to pass
-in the pre-existing coordinate values.  We're using a mock so we don't
-actually hit google on every test run::
+You can also pass in a string; if there's no coordinates passed, we
+use a remote service to look them up from this string.  We're using a
+mock so we don't actually hit google on every test run::
 
     >>> utils.clear_status_messages(prefs_view)
-    >>> utils.clear_all_memos(prefs_view)  # XXX ugh, wish this wasn't necessary.
-    >>> writer.request.form.clear()
-    >>> writer.request.form['geolocation'] = "mock address"
-    >>> writer.request.form['position-latitude'] = old_info['position-latitude']
-    >>> writer.request.form['position-longitude'] = old_info['position-longitude']
-    >>> info, changed = writer.save_coords_from_form()
+    >>> form.clear()
+    >>> form['location'] = "mock address"
+    >>> info, changed = writer.save_coords_from_form(form)
     Called ....geocode('mock address')
+    >>> utils.clear_all_memos(prefs_view)  # XXX ugh, wish this wasn't necessary.
     >>> print writer.geo_info.get('position-latitude')
     12.0
     >>> print writer.geo_info.get('position-longitude')
@@ -187,26 +180,21 @@ XXX We might want to revisit this, it feels kind of schizo.
 For now, this means that other things in the request aren't saved
 unless we invoke the form handler, not just our wrapper viewlet.
 
-    >>> form = writer.request.form
-    >>> writer.geo_info['location'] == form['geolocation']
+    >>> writer.geo_info['location'] == form['location']
     False
 
 We can submit to the preferences view and, since it includes our
 writer viewlet and calls its save method, our information gets stored;
 including the usual archetypes "location" field, for use as a
-human-readable place name (again, we have to set the lat and lon to
-pre-existing values so the text value will be considered as a new
-value)::
+human-readable place name::
 
     >>> prefs_view = proj.restrictedTraverse('preferences')
     >>> utils.clear_status_messages(prefs_view)
-    >>> utils.clear_all_memos(prefs_view)
     >>> prefs_view.request.form.clear()
     >>> prefs_view.request.form.update({'update': True,
     ...     'project_title': 'IGNORANCE IS STRENGTH',
-    ...     'geolocation': 'mock address',
-    ...     'position-longitude': reader.geo_info.get('position-longitude'),
-    ...     'position-latitude': reader.geo_info.get('position-latitude')})
+    ...     'location': 'mock address'})
+
     >>> prefs_view.handle_request()
     Called ....geocode('mock address')
     >>> utils.get_status_messages(prefs_view) #[...u'The location has been changed.'...]
@@ -436,14 +424,14 @@ It implements these interfaces::
     >>> verify.verifyObject(geotagging.interfaces.IReadWriteGeo, writer)
     True
 
-If we save an empty form, the values are cleared::
+If we save an empty form, nothing changes::
 
     >>> writer.geo_info.get('position-latitude')
     ''
     >>> writer.geo_info.get('position-longitude')
     ''
-    >>> writer.request.form = {}
-    >>> info, changed = writer.save_coords_from_form()
+    >>> form = {}
+    >>> info, changed = writer.save_coords_from_form(form)
     >>> changed
     []
     >>> writer.geo_info.get('position-latitude')
@@ -470,7 +458,7 @@ Submitting the profile edit form updates everything, and we get a
 static image url now::
 
     >>> prof_view.request.form.update({'position-latitude': 45.0,
-    ...  'position-longitude': 0.0, 'geolocation': 'somewhere', })
+    ...  'position-longitude': 0.0, 'location': 'somewhere', })
     >>> redirected = prof_view.handle_form()
     >>> utils.clear_all_memos(prof_view)
     >>> pprint(reader.geo_info)
@@ -487,9 +475,7 @@ geocoder to be used::
     >>> prof_view.request.form.clear()
     >>> reader = viewlets.MemberProfileViewlet(prof_view.context,
     ...     prof_view.request, prof_view, 'irrelevant')
-    >>> prof_view.request.form.update({'geolocation': 'atlantis',
-    ...   'position-latitude': reader.geo_info.get('position-latitude'),
-    ...   'position-longitude': reader.geo_info.get('position-longitude')})
+    >>> prof_view.request.form.update({'location': 'atlantis'})
     >>> redirected = prof_view.handle_form()
     Called ...geocode('atlantis')
 
@@ -517,7 +503,7 @@ Request values affect get_geo_info_from_form but not geo_info:
 
     >>> old_info = reader.geo_info.copy()
     >>> prof_view.request.form.update({'position-latitude': 45.0,
-    ...  'position-longitude': 0.0, 'geolocation': 'somewhere', })
+    ...  'position-longitude': 0.0, 'location': 'somewhere', })
 
     >>> info, changed = writer.get_geo_info_from_form()
     >>> info == old_info
@@ -539,10 +525,10 @@ A bit of setup here to avoid depending on previous tests, yuck::
 
     >>> self.login('m1')
     >>> edit = m1.restrictedTraverse('profile-edit')
-    >>> utils.clear_all_memos(edit)
     >>> edit.request.form.clear()
-    >>> edit.request.form.update({'geolocation': 'nowhere', 'position-latitude': -66.0,
+    >>> edit.request.form.update({'location': 'nowhere', 'position-latitude': -66.0,
     ...      'position-longitude': 55.0})
+
     >>> redirected = edit.handle_form()
 
 
@@ -567,7 +553,7 @@ First try the views that generate info, should be public::
      'language': '',
      'link': 'http://nohost/plone/people/m1',
      'location': 'nowhere',
-     'title': 'M\xc3\xabmber O\xc3\xb1e',
+     'title': 'Member One',
      'updated': '...-...-...T...:...:...'}
 
 
@@ -591,7 +577,7 @@ Now the actual georss xml feed::
     <link rel="self" href="http://nohost/plone/people"/>...
     <id>http://nohost/plone/people</id>
     <entry>
-    <title>Mëmber Oñe</title>...
+    <title>Member One</title>...
     <updated>...-...-...T...:...:...</updated>...
     <georss:where><gml:Point>
     <gml:pos>-66.000000 55.000000</gml:pos>
@@ -609,7 +595,7 @@ Now the actual kml feed::
     <Document>...
     <name>People</name>...
     <Placemark>
-    <name>Mëmber Oñe</name>
+    <name>Member One</name>
     <description>...
     <p>URL:
     <a href="http://nohost/plone/people/m1">http://nohost/plone/people/m1</a>...
