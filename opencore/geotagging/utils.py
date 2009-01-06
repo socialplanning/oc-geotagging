@@ -117,12 +117,15 @@ def update_info_from_form(orig_info, form, geocoder):
     >>> geocoder = MockGeocoder()
     >>> from pprint import pprint
 
-    If empty form is passed, nothing changes::
+    If empty form is passed, the values should be cleared::
     >>> info, changed = update_info_from_form(orig, {}, geocoder)
     >>> info == orig
-    True
-    >>> changed
-    []
+    False
+
+    The location will be cleared, and the static_img_url will be set
+    to the default value.
+    >>> sorted(changed)
+    ['location', 'static_img_url']
 
     If only text is passed, we use that for geotagging::
 
@@ -140,15 +143,19 @@ def update_info_from_form(orig_info, form, geocoder):
     >>> print info['static_img_url']
     http://maps.google...
 
+    
     If coordinates are passed, we use those instead. But you must pass both
-    or nothing happens::
+    or you get an error::
 
     >>> form = {'position-latitude': 5}
-    >>> info, changed = update_info_from_form(orig, form, geocoder)
-    >>> info == orig
-    True
-    >>> changed
-    []
+    >>> try:
+    ...     info, changed = update_info_from_form(orig, form, geocoder)
+    ... except ValueError:
+    ...     print 'Error hit'
+    Error hit
+
+    Add the other coordinate and it should work::
+    
     >>> form['position-longitude'] = 6
     >>> info, changed = update_info_from_form(orig, form, geocoder)
     >>> info == orig
@@ -158,7 +165,7 @@ def update_info_from_form(orig_info, form, geocoder):
     >>> info['position-longitude'] == form['position-longitude']
     True
     >>> sorted(changed)
-    ['position-latitude', 'position-longitude', 'static_img_url']
+    ['location', 'position-latitude', 'position-longitude', 'static_img_url']
 
     If text is passed but we get no results from the geocoder, we use
     the old coordinates and put an errors dict in the 'errors'
@@ -212,7 +219,8 @@ def update_info_from_form(orig_info, form, geocoder):
             newlon = float(newlon)
         except (TypeError, ValueError):
             logger.error(
-                "bad values for lat & lon? got %s" % str(newlat, newlon))
+                "bad values for lat & lon? got %s" % str((newlat, newlon)))
+            raise
         else:
             if newlat != oldlat or newlon != oldlon:
                 set_new_latlon = True
