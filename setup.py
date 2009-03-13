@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.5.1dev'
+version = '0.5.1'
 
 setup(name='oc-geotag',
       version=version,
