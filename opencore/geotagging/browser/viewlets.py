@@ -1,4 +1,5 @@
 import warnings
+from Acquisition import aq_base
 from Acquisition import aq_inner
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import base_hasattr
@@ -31,6 +32,9 @@ class ReadGeoViewletBase(ViewletBase):
         pass
 
     def render(self):
+        if getattr(aq_base(self), 'template', None) is not None:
+            renderstr = self.template()
+            return unicode(renderstr, encoding='utf8')
         raise NotImplementedError
 
     def is_geocoded(self):
@@ -66,7 +70,8 @@ class ReadGeoViewletBase(ViewletBase):
             if base_hasattr(context, 'getField'):
                 field = context.getField('location')
                 if field is not None:
-                    location = field.getAccessor(context)()
+                    # go straight to the storage to avoid encoding
+                    location = field.storage.get('location', context)
         return location
 
     def get_geolocation(self):
@@ -189,7 +194,7 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
 class ProjectViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
+    template = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
 
     @property
     def geo_info(self):
@@ -216,12 +221,12 @@ class ProjectEditViewlet(ProjectViewlet, WriteGeoViewletBase):
 
     title = 'Location'
     
-    render = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
+    template = ZopeTwoPageTemplateFile('project_edit_viewlet.pt')
 
 
 class MemberProfileViewlet(ReadGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
+    template = ZopeTwoPageTemplateFile('static_map_viewlet.pt')
         
     @property
     def geo_info(self):
@@ -239,12 +244,12 @@ class MemberProfileViewlet(ReadGeoViewletBase):
 
 class MemberProfileEditViewlet(MemberProfileViewlet, WriteGeoViewletBase):
 
-    render = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
+    template = ZopeTwoPageTemplateFile('profile_edit_viewlet.pt')
 
 
 class MemberProfileSidebarViewlet(MemberProfileViewlet):
 
-    render = ZopeTwoPageTemplateFile('profile_sidebar.pt')
+    template = ZopeTwoPageTemplateFile('profile_sidebar.pt')
 
 
 
