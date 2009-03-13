@@ -203,7 +203,7 @@ def update_info_from_form(orig_info, form, geocoder):
     newlon = form.get('position-longitude', '')
 
     oldloc = orig_info.get('location', '')
-    newloc = form.get('location', '')
+    newloc = form.get('location', '').decode('utf-8')
 
     if newloc != oldloc:
         new_info['location'] = newloc
@@ -234,6 +234,8 @@ def update_info_from_form(orig_info, form, geocoder):
             newlon = ''
             set_new_latlon = True
         else:
+            # re-encode the location value *sigh*
+            newloc = newloc.encode('utf-8')
             records = geocoder.geocode(newloc)
             if records:
                 newlat, newlon = (records[0]['lat'], records[0]['lon'])
