@@ -155,7 +155,7 @@ but not geo_info:
     >>> print info['position-latitude'], info['position-longitude']
     1.2 3.4
     >>> info['location']
-    'my house'
+    u'my house'
 
 
 You can also pass in a string; if the coordinates have changed,
@@ -216,7 +216,7 @@ value)::
     ...     prefs_view.request, prefs_view, "irrelevant manager")
 
     >>> reader.geo_info.get('location')  # saved now.
-    'mock address'
+    u'mock address'
     >>> prefs_view.context.getLocation()
     'mock address'
     
@@ -234,7 +234,7 @@ The viewlet includes a bunch of convenient geo-related stuff for UIs::
     -87.0
 
     >>> reader.geo_info['location']
-    'mock address'
+    u'mock address'
     >>> reader.geo_info['static_img_url']
     'http://maps.google.com/mapdata?latitude_e6=12000000&longitude_e6=4207967296&w=285&h=285&zm=9600&cc='
 
@@ -416,7 +416,7 @@ We can wrap a profile edit view in a geo-specific viewlet::
     ...     prof_view.request, prof_view, 'irrelevant')
     >>> pprint(reader.geo_info)
     {'is_geocoded': False,
-     'location': '',
+     'location': u'',
      'position-latitude': '',
      'position-longitude': '',
      'static_img_url': ''}
@@ -475,7 +475,7 @@ static image url now::
     >>> utils.clear_all_memos(prof_view)
     >>> pprint(reader.geo_info)
     {'is_geocoded': True,
-     'location': 'somewhere',
+     'location': u'somewhere',
      'position-latitude': 45.0,
      'position-longitude': 0.0,
      'static_img_url': 'http://...'}
@@ -496,7 +496,7 @@ geocoder to be used::
     >>> utils.clear_all_memos(prof_view)  # XXX Ugh, make this unnecessary.
     >>> pprint(reader.geo_info)
     {'is_geocoded': True,
-     'location': 'atlantis',
+     'location': u'atlantis',
      'position-latitude': 12.0,
      'position-longitude': -87.0,
      'static_img_url': 'http://...'}
@@ -526,7 +526,7 @@ Request values affect get_geo_info_from_form but not geo_info:
     ['location', 'position-latitude', 'position-longitude', 'static_img_url']
     >>> pprint(info)
     {'is_geocoded': True,
-     'location': 'somewhere',
+     'location': u'somewhere',
      'position-latitude': 45.0,
      'position-longitude': 0.0,
      'static_img_url': 'http://maps...'}
