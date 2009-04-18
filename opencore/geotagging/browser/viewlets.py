@@ -33,8 +33,10 @@ class ReadGeoViewletBase(ViewletBase):
 
     def render(self):
         if getattr(aq_base(self), 'template', None) is not None:
-            renderstr = self.template()
-            return unicode(renderstr, encoding='utf8')
+            result = self.template()
+            if not type(result) is unicode:
+                result = unicode(result, encoding='utf8')
+            return result
         raise NotImplementedError
 
     def is_geocoded(self):
