@@ -132,10 +132,12 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
         for key in ('position-latitude', 'position-longitude'):
             if form.has_key(key):
                 del form[key]
-        # wedge 'location' into the request form so the text can be
-        # saved back into the AT field
-        self.request.form['location'] = form.get('geolocation', '').strip()
-        
+
+        location = form.get('geolocation', u'').strip()
+        if location:
+            self.context.setLocation(location)
+            self.context.reindexObject(idxs=['location'])
+
     def validate(self):
         """We're inventing a convention that viewlets used in forms
         can optionally provide a validate() method that returns a dict
