@@ -135,8 +135,9 @@ class WriteGeoViewletBase(ReadGeoViewletBase):
 
         location = form.get('geolocation', u'').strip()
         if location:
-            self.context.setLocation(location)
-            self.context.reindexObject(idxs=['location'])
+            context = self._get_viewedcontent()
+            context.setLocation(location)
+            context.reindexObject(idxs=['location'])
 
     def validate(self):
         """We're inventing a convention that viewlets used in forms
